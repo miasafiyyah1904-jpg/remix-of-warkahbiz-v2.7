@@ -164,6 +164,10 @@ export function SalesForecast({
         predicted_high: d.high,
         weather_adjust: d.weatherMult - 1,
         weather_label: d.weather?.label ?? null,
+        cultural_adjust: d.culturalSignal.multiplier,
+        cultural_label:  d.culturalSignal.label ?? null,
+        payday_adjust:   d.paydaySignal.multiplier,
+        payday_label:    d.paydaySignal.label ?? null,
       })),
     ).catch(() => {});
   }, [days, weatherLoading]);
