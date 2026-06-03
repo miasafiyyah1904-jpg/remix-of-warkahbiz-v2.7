@@ -277,24 +277,26 @@ export function SalesForecast({
               )}
             </div>
 
-            {/* Manual multiplier toggles */}
+            {/* Auto-detected signals + manual override */}
             <section className="rounded-2xl bg-card border border-border p-3 space-y-2">
               <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{t("sf_multiplierTitle")}</p>
-              <div className="flex flex-wrap gap-2">
-                <MultiplierToggle active={ramadanOn} onClick={() => setRamadanOn(v => !v)} label={t("sf_multRamadan")} mult={RAMADAN_MULT} />
-                <MultiplierToggle active={schoolHolOn} onClick={() => setSchoolHolOn(v => !v)} label={t("sf_multSchool")} mult={SCHOOL_MULT} />
-                <MultiplierToggle active={heavyRainOn} onClick={() => setHeavyRainOn(v => !v)} label={t("sf_multRain")} mult={RAIN_MULT} />
-              </div>
-              <div className="flex flex-wrap gap-1.5 pt-1">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground self-center mr-1">{t("sf_activeMultipliers")}:</span>
-                {ramadanOn && <ActiveChip label={`${t("sf_multRamadan")} ×${RAMADAN_MULT}`} />}
-                {schoolHolOn && <ActiveChip label={`${t("sf_multSchool")} ×${SCHOOL_MULT}`} />}
-                {heavyRainOn && <ActiveChip label={`${t("sf_multRain")} ×${RAIN_MULT}`} />}
-                {!ramadanOn && !schoolHolOn && !heavyRainOn && (
-                  <span className="text-[11px] text-muted-foreground italic">{t("sf_noActiveMult")}</span>
+
+              <div className="flex flex-wrap gap-1.5">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground self-center mr-1">{t("sf_autoDetected")}:</span>
+                {days.filter(d => d.culturalSignal.label || d.paydaySignal.label).slice(0, 3).map(d => (
+                  <ActiveChip key={d.isoDate} label={`${d.dayName}: ${d.culturalSignal.label ?? d.paydaySignal.label}`} />
+                ))}
+                {days.every(d => !d.culturalSignal.label && !d.paydaySignal.label) && (
+                  <span className="text-[11px] text-muted-foreground italic">{t("sf_noAutoEvents")}</span>
                 )}
               </div>
+
+              <div className="flex flex-wrap gap-2 items-center pt-1">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mr-1">{t("sf_manualOverride")}:</span>
+                <MultiplierToggle active={heavyRainOn} onClick={() => setHeavyRainOn(v => !v)} label={t("sf_multRain")} mult={RAIN_MULT} />
+              </div>
             </section>
+
 
 
             {/* Storm alert */}
