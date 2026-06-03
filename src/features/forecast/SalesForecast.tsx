@@ -390,6 +390,18 @@ export function SalesForecast({
                         {" "}({detail.weather.trafficAdjust >= 0 ? "+" : ""}{Math.round(detail.weather.trafficAdjust * 100)}% {t("sf_traffic")})
                       </p>
                     )}
+                    {detail.culturalSignal.label && (
+                      <p className="text-xs text-muted-foreground mt-1.5">
+                        🗓️ {detail.culturalSignal.label}
+                        {" "}({detail.culturalSignal.multiplier >= 1 ? "+" : ""}{Math.round((detail.culturalSignal.multiplier - 1) * 100)}% jangkaan)
+                      </p>
+                    )}
+                    {detail.paydaySignal.label && (
+                      <p className="text-xs text-muted-foreground mt-1.5">
+                        💰 {detail.paydaySignal.label}
+                        {" "}(+{Math.round((detail.paydaySignal.multiplier - 1) * 100)}% jangkaan)
+                      </p>
+                    )}
                   </div>
                 </div>
 
