@@ -10,6 +10,7 @@ import { computeWeekdayStats, predictStockPrep } from "./realAggregate";
 import { saveForecasts, fetchPastAccuracy } from "./forecastApi";
 import { emojiForItem } from "@/lib/stockEmoji";
 import { useTranslation } from "@/context/LanguageContext";
+import { getCulturalMultiplier, getPaydayMultiplier, type CulturalSignal, type PaydaySignal } from "@/lib/malaysianHolidays";
 
 const DAY_NAMES_MS = ["Isnin", "Selasa", "Rabu", "Khamis", "Jumaat", "Sabtu", "Ahad"];
 const MONTH_SHORT = ["Jan","Feb","Mac","Apr","Mei","Jun","Jul","Ogs","Sep","Okt","Nov","Dis"];
