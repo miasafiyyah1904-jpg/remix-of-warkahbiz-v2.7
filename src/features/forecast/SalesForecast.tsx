@@ -73,16 +73,9 @@ export function SalesForecast({
   const { data: weather, loading: weatherLoading, error: weatherError } = useWeather();
 
   // ── Manual multiplier toggles ─────────────────────────────────────────
-  const [ramadanOn, setRamadanOn] = useState(false);
-  const [schoolHolOn, setSchoolHolOn] = useState(false);
   const [heavyRainOn, setHeavyRainOn] = useState(false);
-  const RAMADAN_MULT = 1.2;
-  const SCHOOL_MULT = 1.15;
   const RAIN_MULT = 0.8;
-  const manualMult =
-    (ramadanOn ? RAMADAN_MULT : 1) *
-    (schoolHolOn ? SCHOOL_MULT : 1) *
-    (heavyRainOn ? RAIN_MULT : 1);
+  const manualMult = heavyRainOn ? RAIN_MULT : 1;
 
   // ── Real historical stats ─────────────────────────────────────────────
   const stats = useMemo(() => computeWeekdayStats(txns, 30), [txns]);
