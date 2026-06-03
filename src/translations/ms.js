@@ -1101,5 +1101,8 @@ export default {
   "sf_multRain": "Hujan Lebat",
   "sf_activeMultipliers": "Aktif",
   "sf_noActiveMult": "Tiada pelaras aktif",
+  "sf_noAutoEvents":  "Tiada acara kalendar minggu ini",
+  "sf_manualOverride": "Pelaras manual",
+  "sf_autoDetected":  "Dikesan automatik",
 };
 
