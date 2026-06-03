@@ -50,6 +50,8 @@ interface DayCalc {
   reasons: string[];
   weather: ReturnType<typeof useWeather>["data"] extends (infer U)[] | null ? U | undefined : undefined;
   weatherMult: number;
+  culturalSignal: CulturalSignal;
+  paydaySignal:   PaydaySignal;
   stock: { emoji: string; name: string; need: number; unit: Unit }[];
 }
 
