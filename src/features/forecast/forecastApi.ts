@@ -11,6 +11,10 @@ export interface ForecastSavePayload {
   predicted_high: number;
   weather_adjust: number;
   weather_label?: string | null;
+  cultural_adjust?: number;
+  cultural_label?:  string | null;
+  payday_adjust?:   number;
+  payday_label?:    string | null;
 }
 
 export async function saveForecasts(items: ForecastSavePayload[]) {

@@ -1102,5 +1102,8 @@ export default {
   "sf_multRain": "Heavy Rain",
   "sf_activeMultipliers": "Active",
   "sf_noActiveMult": "No active adjusters",
+  "sf_noAutoEvents":  "No calendar events this week",
+  "sf_manualOverride": "Manual override",
+  "sf_autoDetected":  "Auto-detected",
 };
 

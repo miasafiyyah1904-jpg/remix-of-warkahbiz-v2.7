@@ -10,6 +10,7 @@ import { computeWeekdayStats, predictStockPrep } from "./realAggregate";
 import { saveForecasts, fetchPastAccuracy } from "./forecastApi";
 import { emojiForItem } from "@/lib/stockEmoji";
 import { useTranslation } from "@/context/LanguageContext";
+import { getCulturalMultiplier, getPaydayMultiplier, type CulturalSignal, type PaydaySignal } from "@/lib/malaysianHolidays";
 
 const DAY_NAMES_MS = ["Isnin", "Selasa", "Rabu", "Khamis", "Jumaat", "Sabtu", "Ahad"];
 const MONTH_SHORT = ["Jan","Feb","Mac","Apr","Mei","Jun","Jul","Ogs","Sep","Okt","Nov","Dis"];
@@ -49,6 +50,8 @@ interface DayCalc {
   reasons: string[];
   weather: ReturnType<typeof useWeather>["data"] extends (infer U)[] | null ? U | undefined : undefined;
   weatherMult: number;
+  culturalSignal: CulturalSignal;
+  paydaySignal:   PaydaySignal;
   stock: { emoji: string; name: string; need: number; unit: Unit }[];
 }
 
@@ -70,16 +73,9 @@ export function SalesForecast({
   const { data: weather, loading: weatherLoading, error: weatherError } = useWeather();
 
   // ── Manual multiplier toggles ─────────────────────────────────────────
-  const [ramadanOn, setRamadanOn] = useState(false);
-  const [schoolHolOn, setSchoolHolOn] = useState(false);
   const [heavyRainOn, setHeavyRainOn] = useState(false);
-  const RAMADAN_MULT = 1.2;
-  const SCHOOL_MULT = 1.15;
   const RAIN_MULT = 0.8;
-  const manualMult =
-    (ramadanOn ? RAMADAN_MULT : 1) *
-    (schoolHolOn ? SCHOOL_MULT : 1) *
-    (heavyRainOn ? RAIN_MULT : 1);
+  const manualMult = heavyRainOn ? RAIN_MULT : 1;
 
   // ── Real historical stats ─────────────────────────────────────────────
   const stats = useMemo(() => computeWeekdayStats(txns, 30), [txns]);
@@ -100,7 +96,14 @@ export function SalesForecast({
 
       const w = weather?.[i];
       const weatherMult = clampMultiplier(1 + (w?.trafficAdjust ?? 0));
-      const combinedMult = clampMultiplier(weatherMult * manualMult);
+      const culturalSignal = getCulturalMultiplier(date);
+      const paydaySignal   = getPaydayMultiplier(date);
+      const combinedMult = clampMultiplier(
+        weatherMult *
+        culturalSignal.multiplier *
+        paydaySignal.multiplier *
+        manualMult
+      );
       const point = forecastDay(weekdayIdx, baselineForDay, 0.55, combinedMult, stats.noiseCV, 0.85);
 
 
@@ -108,6 +111,13 @@ export function SalesForecast({
       const samples = stats.perWeekdaySamples[weekdayIdx];
       if (samples > 0) reasons.push(`${t("sf_avgDay")} ${DAY_NAMES_MS[weekdayIdx]} (${samples} ${t("sf_records")}): ${fmt(baselineForDay)}`);
       if (w && w.severity !== "ok") reasons.push(`${t("sf_weather")}: ${w.label} ${w.emoji} (${w.trafficAdjust >= 0 ? "+" : ""}${Math.round(w.trafficAdjust * 100)}% ${t("sf_traffic")})`);
+      if (culturalSignal.label) {
+        const dir = culturalSignal.multiplier >= 1 ? "+" : "";
+        reasons.push(`${culturalSignal.label} (${dir}${Math.round((culturalSignal.multiplier - 1) * 100)}% jangkaan)`);
+      }
+      if (paydaySignal.label) {
+        reasons.push(`${paydaySignal.label} (+${Math.round((paydaySignal.multiplier - 1) * 100)}% jangkaan)`);
+      }
       if (baselineForDay > stats.baseline * 1.15) reasons.push(`${DAY_NAMES_MS[weekdayIdx]} ${t("sf_usuallyBusy")} ${boss}`);
       if (baselineForDay < stats.baseline * 0.85) reasons.push(`${DAY_NAMES_MS[weekdayIdx]} ${t("sf_usuallySlow")}`);
 
@@ -128,6 +138,8 @@ export function SalesForecast({
         reasons,
         weather: w,
         weatherMult,
+        culturalSignal,
+        paydaySignal,
         stock: stockPrep.map((s) => ({
           emoji: emojiForItem(s.name),
           name: s.name,
@@ -152,6 +164,10 @@ export function SalesForecast({
         predicted_high: d.high,
         weather_adjust: d.weatherMult - 1,
         weather_label: d.weather?.label ?? null,
+        cultural_adjust: d.culturalSignal.multiplier,
+        cultural_label:  d.culturalSignal.label ?? null,
+        payday_adjust:   d.paydaySignal.multiplier,
+        payday_label:    d.paydaySignal.label ?? null,
       })),
     ).catch(() => {});
   }, [days, weatherLoading]);
@@ -265,24 +281,26 @@ export function SalesForecast({
               )}
             </div>
 
-            {/* Manual multiplier toggles */}
+            {/* Auto-detected signals + manual override */}
             <section className="rounded-2xl bg-card border border-border p-3 space-y-2">
               <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{t("sf_multiplierTitle")}</p>
-              <div className="flex flex-wrap gap-2">
-                <MultiplierToggle active={ramadanOn} onClick={() => setRamadanOn(v => !v)} label={t("sf_multRamadan")} mult={RAMADAN_MULT} />
-                <MultiplierToggle active={schoolHolOn} onClick={() => setSchoolHolOn(v => !v)} label={t("sf_multSchool")} mult={SCHOOL_MULT} />
-                <MultiplierToggle active={heavyRainOn} onClick={() => setHeavyRainOn(v => !v)} label={t("sf_multRain")} mult={RAIN_MULT} />
-              </div>
-              <div className="flex flex-wrap gap-1.5 pt-1">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground self-center mr-1">{t("sf_activeMultipliers")}:</span>
-                {ramadanOn && <ActiveChip label={`${t("sf_multRamadan")} ×${RAMADAN_MULT}`} />}
-                {schoolHolOn && <ActiveChip label={`${t("sf_multSchool")} ×${SCHOOL_MULT}`} />}
-                {heavyRainOn && <ActiveChip label={`${t("sf_multRain")} ×${RAIN_MULT}`} />}
-                {!ramadanOn && !schoolHolOn && !heavyRainOn && (
-                  <span className="text-[11px] text-muted-foreground italic">{t("sf_noActiveMult")}</span>
+
+              <div className="flex flex-wrap gap-1.5">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground self-center mr-1">{t("sf_autoDetected")}:</span>
+                {days.filter(d => d.culturalSignal.label || d.paydaySignal.label).slice(0, 3).map(d => (
+                  <ActiveChip key={d.isoDate} label={`${d.dayName}: ${d.culturalSignal.label ?? d.paydaySignal.label}`} />
+                ))}
+                {days.every(d => !d.culturalSignal.label && !d.paydaySignal.label) && (
+                  <span className="text-[11px] text-muted-foreground italic">{t("sf_noAutoEvents")}</span>
                 )}
               </div>
+
+              <div className="flex flex-wrap gap-2 items-center pt-1">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mr-1">{t("sf_manualOverride")}:</span>
+                <MultiplierToggle active={heavyRainOn} onClick={() => setHeavyRainOn(v => !v)} label={t("sf_multRain")} mult={RAIN_MULT} />
+              </div>
             </section>
+
 
 
             {/* Storm alert */}
@@ -329,6 +347,11 @@ export function SalesForecast({
                         </div>
                         {w && <span className="text-base leading-none" title={`${w.label} · ${Math.round(w.tMax)}°`}>{w.emoji}</span>}
                       </div>
+                      {(d.culturalSignal.label || d.paydaySignal.label) && (
+                        <span className="mt-1 block text-[9px] font-semibold text-muted-foreground truncate" title={d.culturalSignal.label ?? d.paydaySignal.label ?? ""}>
+                          {d.culturalSignal.label ?? d.paydaySignal.label}
+                        </span>
+                      )}
                       <span className={`mt-2 inline-block text-[9px] font-bold px-2 py-0.5 rounded-full ${meta.chipClass}`}>
                         {meta.emoji} {t(meta.labelKey)}
                       </span>
@@ -369,6 +392,18 @@ export function SalesForecast({
                       <p className="text-xs text-muted-foreground mt-1.5 flex items-center gap-1">
                         <CloudRain className="w-3 h-3" /> {detail.weather.label} {detail.weather.emoji}
                         {" "}({detail.weather.trafficAdjust >= 0 ? "+" : ""}{Math.round(detail.weather.trafficAdjust * 100)}% {t("sf_traffic")})
+                      </p>
+                    )}
+                    {detail.culturalSignal.label && (
+                      <p className="text-xs text-muted-foreground mt-1.5">
+                        🗓️ {detail.culturalSignal.label}
+                        {" "}({detail.culturalSignal.multiplier >= 1 ? "+" : ""}{Math.round((detail.culturalSignal.multiplier - 1) * 100)}% jangkaan)
+                      </p>
+                    )}
+                    {detail.paydaySignal.label && (
+                      <p className="text-xs text-muted-foreground mt-1.5">
+                        💰 {detail.paydaySignal.label}
+                        {" "}(+{Math.round((detail.paydaySignal.multiplier - 1) * 100)}% jangkaan)
                       </p>
                     )}
                   </div>
