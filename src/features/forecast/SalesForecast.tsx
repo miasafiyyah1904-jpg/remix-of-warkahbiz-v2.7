@@ -343,6 +343,11 @@ export function SalesForecast({
                         </div>
                         {w && <span className="text-base leading-none" title={`${w.label} · ${Math.round(w.tMax)}°`}>{w.emoji}</span>}
                       </div>
+                      {(d.culturalSignal.label || d.paydaySignal.label) && (
+                        <span className="mt-1 block text-[9px] font-semibold text-muted-foreground truncate" title={d.culturalSignal.label ?? d.paydaySignal.label ?? ""}>
+                          {d.culturalSignal.label ?? d.paydaySignal.label}
+                        </span>
+                      )}
                       <span className={`mt-2 inline-block text-[9px] font-bold px-2 py-0.5 rounded-full ${meta.chipClass}`}>
                         {meta.emoji} {t(meta.labelKey)}
                       </span>
