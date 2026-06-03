@@ -96,7 +96,14 @@ export function SalesForecast({
 
       const w = weather?.[i];
       const weatherMult = clampMultiplier(1 + (w?.trafficAdjust ?? 0));
-      const combinedMult = clampMultiplier(weatherMult * manualMult);
+      const culturalSignal = getCulturalMultiplier(date);
+      const paydaySignal   = getPaydayMultiplier(date);
+      const combinedMult = clampMultiplier(
+        weatherMult *
+        culturalSignal.multiplier *
+        paydaySignal.multiplier *
+        manualMult
+      );
       const point = forecastDay(weekdayIdx, baselineForDay, 0.55, combinedMult, stats.noiseCV, 0.85);
 
 
@@ -104,6 +111,13 @@ export function SalesForecast({
       const samples = stats.perWeekdaySamples[weekdayIdx];
       if (samples > 0) reasons.push(`${t("sf_avgDay")} ${DAY_NAMES_MS[weekdayIdx]} (${samples} ${t("sf_records")}): ${fmt(baselineForDay)}`);
       if (w && w.severity !== "ok") reasons.push(`${t("sf_weather")}: ${w.label} ${w.emoji} (${w.trafficAdjust >= 0 ? "+" : ""}${Math.round(w.trafficAdjust * 100)}% ${t("sf_traffic")})`);
+      if (culturalSignal.label) {
+        const dir = culturalSignal.multiplier >= 1 ? "+" : "";
+        reasons.push(`${culturalSignal.label} (${dir}${Math.round((culturalSignal.multiplier - 1) * 100)}% jangkaan)`);
+      }
+      if (paydaySignal.label) {
+        reasons.push(`${paydaySignal.label} (+${Math.round((paydaySignal.multiplier - 1) * 100)}% jangkaan)`);
+      }
       if (baselineForDay > stats.baseline * 1.15) reasons.push(`${DAY_NAMES_MS[weekdayIdx]} ${t("sf_usuallyBusy")} ${boss}`);
       if (baselineForDay < stats.baseline * 0.85) reasons.push(`${DAY_NAMES_MS[weekdayIdx]} ${t("sf_usuallySlow")}`);
 
@@ -124,6 +138,8 @@ export function SalesForecast({
         reasons,
         weather: w,
         weatherMult,
+        culturalSignal,
+        paydaySignal,
         stock: stockPrep.map((s) => ({
           emoji: emojiForItem(s.name),
           name: s.name,
