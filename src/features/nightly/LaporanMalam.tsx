@@ -76,7 +76,7 @@ export function LaporanMalam({ onClose, businessName, txns, opex, stock }: Props
   const noDataToday = aggregate.transactionCount === 0 && aggregate.totalSales === 0;
   const beforeReportTime = isBefore8PM();
 
-  const ruleBasedActions = useMemo(() => buildRuleBasedActions(aggregate, weeklyTarget), [aggregate, weeklyTarget]);
+  const ruleBasedActions = useMemo(() => buildRuleBasedActions(aggregate, weeklyTarget, t), [aggregate, weeklyTarget, t]);
 
   const generateReport = useCallback(async () => {
     setGenerating(true);
@@ -304,18 +304,18 @@ export function LaporanMalam({ onClose, businessName, txns, opex, stock }: Props
 }
 
 // ============= Rule-based action generation =============
-function buildRuleBasedActions(agg: DailyAggregate, weeklyTarget: number): string[] {
+function buildRuleBasedActions(agg: DailyAggregate, weeklyTarget: number, t: (key: string, params?: Record<string, string | number>) => string): string[] {
   const actions: string[] = [];
 
   // Stock purchases
   agg.criticalItems.slice(0, 2).forEach((it) => {
-    actions.push(`Beli ${it.name} — segera (kini ${it.qty} ${it.unit} sahaja)`);
+    actions.push(t("lm_action_buy_stock").replace("{name}", it.name).replace("{qty}", String(it.qty)).replace("{unit}", it.unit));
   });
 
   // Tomorrow's sales target (5% above today as simple heuristic)
   const tomorrowTarget = Math.max(agg.totalSales * 1.05, agg.totalSales + 50);
   if (agg.totalSales > 0) {
-    actions.push(`Sasaran jualan esok: RM ${tomorrowTarget.toFixed(0)} (5% lebih dari hari ini)`);
+    actions.push(t("lm_action_tomorrow_target").replace("{target}", tomorrowTarget.toFixed(0)));
   }
 
   // Behind weekly target?
@@ -323,7 +323,7 @@ function buildRuleBasedActions(agg: DailyAggregate, weeklyTarget: number): strin
   const daysLeft = Math.max(7 - agg.weeklyDayIndex - 1, 1);
   if (remaining > 0 && weeklyTarget > 0) {
     const dailyNeed = remaining / daysLeft;
-    actions.push(`Boss perlu jualan RM ${dailyNeed.toFixed(0)}/hari untuk capai target minggu`);
+    actions.push(t("lm_action_weekly_gap").replace("{daily}", dailyNeed.toFixed(0)));
   }
 
   return actions;
@@ -378,24 +378,24 @@ function ReportContent(p: ReportContentProps) {
       const date = formatDateLong(agg.reportDate);
       let y = 18;
       doc.setFontSize(18);
-      doc.text("Laporan Malam WarkahBiz", 14, y);
+      doc.text(t("lm_pdf_title"), 14, y);
       y += 8;
       doc.setFontSize(11);
       doc.text(`${p.businessName || "WarkahBiz"} — ${date}`, 14, y);
       y += 12;
 
       doc.setFontSize(13);
-      doc.text("Ringkasan Hari Ini", 14, y);
+      doc.text(t("lm_pdf_daily_summary"), 14, y);
       y += 7;
       doc.setFontSize(11);
       const rows: [string, string][] = [
         ["Jualan", `RM ${agg.totalSales.toFixed(2)}`],
         ["Belanja", `RM ${agg.totalExpenses.toFixed(2)}`],
         ["Untung Bersih", `RM ${agg.netProfit.toFixed(2)}`],
-        ["Bilangan transaksi", String(agg.transactionCount)],
-        ["Jualan semalam", `RM ${agg.yesterdaySales.toFixed(2)}`],
+        [t("lm_pdf_txn_count"), String(agg.transactionCount)],
+        [t("lm_pdf_yesterday_sales"), `RM ${agg.yesterdaySales.toFixed(2)}`],
         [
-          "Perubahan jualan",
+          t("lm_pdf_sales_change"),
           agg.salesChangePct === null ? "—" : `${agg.salesChangePct.toFixed(1)}%`,
         ],
       ];
@@ -415,7 +415,7 @@ function ReportContent(p: ReportContentProps) {
 
       if (agg.criticalItems.length) {
         doc.setFontSize(13);
-        doc.text("Stok Kritikal", 14, y);
+        doc.text(t("lm_pdf_critical_stock"), 14, y);
         y += 7;
         doc.setFontSize(11);
         agg.criticalItems.forEach((i) => {
@@ -444,7 +444,7 @@ function ReportContent(p: ReportContentProps) {
       if (r?.ai_summary) {
         if (y > 240) { doc.addPage(); y = 18; }
         doc.setFontSize(13);
-        doc.text("Analisis AI", 14, y);
+        doc.text(t("lm_pdf_ai_analysis"), 14, y);
         y += 7;
         doc.setFontSize(10);
         const lines = doc.splitTextToSize(r.ai_summary, 180);
@@ -456,7 +456,7 @@ function ReportContent(p: ReportContentProps) {
       }
 
       doc.setFontSize(9);
-      doc.text("Dijana oleh WarkahBiz App", 14, 290);
+      doc.text(t("lm_pdf_footer"), 14, 290);
       doc.save(`Laporan-${agg.reportDate}.pdf`);
       toast.success(t("lm_pdfSuccess"));
     } catch (e) {

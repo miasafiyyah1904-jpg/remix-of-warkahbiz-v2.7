@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useState } from "react";
 import type { Tab } from "@/types";
+import { useTranslation } from "@/context/LanguageContext";
 
 type Step = {
   selector: string;
@@ -8,45 +9,6 @@ type Step = {
   navigateTo?: Tab;
 };
 
-const STEPS: Step[] = [
-  {
-    selector: '[data-tutorial="tab-profile"]',
-    title: "👤 Mula di sini — Profil Anda",
-    body: "Masukkan nama bisnes, jenis kedai, dan muat naik gambar profil anda. Ini adalah langkah pertama sebelum anda mula guna app.",
-    navigateTo: "today",
-  },
-  {
-    selector: '[data-tutorial="menu-products"]',
-    title: "🛍️ Tambah Produk Anda",
-    body: "Tambah produk yang anda jual. Masukkan nama, bahan-bahan, dan harga — app akan kira kos dan untung untuk anda.",
-    navigateTo: "profile",
-  },
-  {
-    selector: '[data-tutorial="fab-add"]',
-    title: "💰 Rekod Jualan & Belanja",
-    body: "Setiap hari, rekod duit yang masuk (Dapat Duit) dan duit yang keluar (Pembelian). Anda juga boleh imbas resit terus.",
-    navigateTo: "today",
-  },
-  {
-    selector: '[data-tutorial="tab-bekalan"]',
-    title: "📦 Urus Stok Bahan",
-    body: "Tab Bekalan tunjukkan senarai bahan yang perlu dibeli berdasarkan produk anda. Tandakan bahan yang dah dibeli dan kongsi senarai dengan pembekal.",
-    navigateTo: "bekalan",
-  },
-  {
-    selector: '[data-tutorial="tab-log"]',
-    title: "🧾 Log Kos Operasi",
-    body: "Rekod kos tetap seperti utiliti, sewa, gaji, pengangkutan dan lesen di sini supaya untung bersih anda lebih tepat.",
-    navigateTo: "log",
-  },
-  {
-    selector: '[data-tutorial="tab-ai"]',
-    title: "📊 Rekod & Tanya AI",
-    body: "Lihat sejarah kewangan penuh di tab Rekod. Gunakan Tanya AI untuk dapatkan jawapan tentang bisnes anda — keuntungan, cadangan, dan lebih lagi.",
-    navigateTo: "log",
-  },
-];
-
 interface Props {
   userId: string;
   onComplete: () => void;
@@ -54,9 +16,19 @@ interface Props {
 }
 
 export default function OnboardingTutorial({ userId, onComplete, onNavigate }: Props) {
+  const { t } = useTranslation();
   const [step, setStep] = useState(0);
   const [done, setDone] = useState(false);
   const [rect, setRect] = useState<DOMRect | null>(null);
+
+  const STEPS: Step[] = [
+    { selector: '[data-tutorial="tab-profile"]',  title: t("tut_step1_title"), body: t("tut_step1_body"), navigateTo: "today" },
+    { selector: '[data-tutorial="menu-products"]', title: t("tut_step2_title"), body: t("tut_step2_body"), navigateTo: "profile" },
+    { selector: '[data-tutorial="fab-add"]',       title: t("tut_step3_title"), body: t("tut_step3_body"), navigateTo: "today" },
+    { selector: '[data-tutorial="tab-bekalan"]',   title: t("tut_step4_title"), body: t("tut_step4_body"), navigateTo: "bekalan" },
+    { selector: '[data-tutorial="tab-log"]',       title: t("tut_step5_title"), body: t("tut_step5_body"), navigateTo: "log" },
+    { selector: '[data-tutorial="tab-ai"]',        title: t("tut_step6_title"), body: t("tut_step6_body"), navigateTo: "log" },
+  ];
 
   const current = STEPS[step];
 
@@ -80,7 +52,7 @@ export default function OnboardingTutorial({ userId, onComplete, onNavigate }: P
       }
     };
     // Wait a tick for tab content to render
-    const t = setTimeout(() => {
+    const timer = setTimeout(() => {
       measure();
       raf = requestAnimationFrame(measure);
     }, 250);
@@ -88,7 +60,7 @@ export default function OnboardingTutorial({ userId, onComplete, onNavigate }: P
     window.addEventListener("resize", onResize);
     window.addEventListener("scroll", onResize, true);
     return () => {
-      clearTimeout(t);
+      clearTimeout(timer);
       cancelAnimationFrame(raf);
       window.removeEventListener("resize", onResize);
       window.removeEventListener("scroll", onResize, true);
@@ -118,15 +90,15 @@ export default function OnboardingTutorial({ userId, onComplete, onNavigate }: P
       <div className="fixed inset-0 z-[100] grid place-items-center p-5 bg-black/70 backdrop-blur-sm animate-fade-in">
         <div className="relative w-full max-w-sm bg-surface rounded-3xl p-6 text-center animate-pop-in">
           <div className="w-16 h-16 mx-auto rounded-full bg-green-100 dark:bg-green-900/40 grid place-items-center text-4xl">✅</div>
-          <h3 className="font-extrabold text-2xl mt-4">Anda Dah Sedia!</h3>
+          <h3 className="font-extrabold text-2xl mt-4">{t("tut_done_heading")}</h3>
           <p className="text-sm text-muted-foreground mt-3 leading-relaxed">
-            Tutorial selesai. Mula gunakan Warkah Biz untuk uruskan bisnes anda dengan lebih mudah.
+            {t("tut_done_body")}
           </p>
           <button
             onClick={finish}
             className="mt-6 w-full h-12 rounded-2xl bg-green-600 hover:bg-green-700 text-white font-extrabold tap"
           >
-            Mula Sekarang 🚀
+            {t("tut_done_button")}
           </button>
         </div>
       </div>
@@ -188,7 +160,7 @@ export default function OnboardingTutorial({ userId, onComplete, onNavigate }: P
           />
           <button
             type="button"
-            aria-label="Seterusnya"
+            aria-label={t("tut_highlight_next")}
             onClick={(e) => { e.preventDefault(); e.stopPropagation(); next(); }}
             className="absolute cursor-pointer bg-transparent border-0 p-0"
             style={{
@@ -215,13 +187,13 @@ export default function OnboardingTutorial({ userId, onComplete, onNavigate }: P
       >
         <div className="flex items-center justify-between mb-2">
           <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
-            Langkah {step + 1} dari {STEPS.length}
+            {t("tut_step_counter", { current: step + 1, total: STEPS.length })}
           </span>
           <button
             onClick={skip}
             className="text-xs font-semibold text-muted-foreground hover:text-foreground tap"
           >
-            Langkau
+            {t("tut_skip")}
           </button>
         </div>
         <h3 className="font-extrabold text-lg leading-snug">{current.title}</h3>
@@ -230,7 +202,7 @@ export default function OnboardingTutorial({ userId, onComplete, onNavigate }: P
           onClick={next}
           className="mt-4 w-full h-11 rounded-xl bg-primary text-primary-foreground font-bold tap"
         >
-          {step >= STEPS.length - 1 ? "Selesai →" : "Seterusnya →"}
+          {step >= STEPS.length - 1 ? t("tut_finish") : t("tut_next")}
         </button>
       </div>
     </div>
