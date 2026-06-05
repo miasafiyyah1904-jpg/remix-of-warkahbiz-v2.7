@@ -90,15 +90,15 @@ export default function OnboardingTutorial({ userId, onComplete, onNavigate }: P
       <div className="fixed inset-0 z-[100] grid place-items-center p-5 bg-black/70 backdrop-blur-sm animate-fade-in">
         <div className="relative w-full max-w-sm bg-surface rounded-3xl p-6 text-center animate-pop-in">
           <div className="w-16 h-16 mx-auto rounded-full bg-green-100 dark:bg-green-900/40 grid place-items-center text-4xl">✅</div>
-          <h3 className="font-extrabold text-2xl mt-4">Anda Dah Sedia!</h3>
+          <h3 className="font-extrabold text-2xl mt-4">{t("tut_done_heading")}</h3>
           <p className="text-sm text-muted-foreground mt-3 leading-relaxed">
-            Tutorial selesai. Mula gunakan Warkah Biz untuk uruskan bisnes anda dengan lebih mudah.
+            {t("tut_done_body")}
           </p>
           <button
             onClick={finish}
             className="mt-6 w-full h-12 rounded-2xl bg-green-600 hover:bg-green-700 text-white font-extrabold tap"
           >
-            Mula Sekarang 🚀
+            {t("tut_done_button")}
           </button>
         </div>
       </div>
@@ -160,7 +160,7 @@ export default function OnboardingTutorial({ userId, onComplete, onNavigate }: P
           />
           <button
             type="button"
-            aria-label="Seterusnya"
+            aria-label={t("tut_highlight_next")}
             onClick={(e) => { e.preventDefault(); e.stopPropagation(); next(); }}
             className="absolute cursor-pointer bg-transparent border-0 p-0"
             style={{
@@ -187,13 +187,13 @@ export default function OnboardingTutorial({ userId, onComplete, onNavigate }: P
       >
         <div className="flex items-center justify-between mb-2">
           <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
-            Langkah {step + 1} dari {STEPS.length}
+            {t("tut_step_counter", { current: step + 1, total: STEPS.length })}
           </span>
           <button
             onClick={skip}
             className="text-xs font-semibold text-muted-foreground hover:text-foreground tap"
           >
-            Langkau
+            {t("tut_skip")}
           </button>
         </div>
         <h3 className="font-extrabold text-lg leading-snug">{current.title}</h3>
@@ -202,7 +202,7 @@ export default function OnboardingTutorial({ userId, onComplete, onNavigate }: P
           onClick={next}
           className="mt-4 w-full h-11 rounded-xl bg-primary text-primary-foreground font-bold tap"
         >
-          {step >= STEPS.length - 1 ? "Selesai →" : "Seterusnya →"}
+          {step >= STEPS.length - 1 ? t("tut_finish") : t("tut_next")}
         </button>
       </div>
     </div>
