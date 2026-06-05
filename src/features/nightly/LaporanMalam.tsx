@@ -367,6 +367,7 @@ function ReportContent(p: ReportContentProps) {
       businessName: p.businessName,
       weeklyTarget: p.weeklyTarget,
       actions: p.actions,
+      t,
     });
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
   };
@@ -389,9 +390,9 @@ function ReportContent(p: ReportContentProps) {
       y += 7;
       doc.setFontSize(11);
       const rows: [string, string][] = [
-        ["Jualan", `RM ${agg.totalSales.toFixed(2)}`],
-        ["Belanja", `RM ${agg.totalExpenses.toFixed(2)}`],
-        ["Untung Bersih", `RM ${agg.netProfit.toFixed(2)}`],
+        [t("lm_sales"), `RM ${agg.totalSales.toFixed(2)}`],
+        [t("lm_expenses"), `RM ${agg.totalExpenses.toFixed(2)}`],
+        [t("lm_netProfit"), `RM ${agg.netProfit.toFixed(2)}`],
         [t("lm_pdf_txn_count"), String(agg.transactionCount)],
         [t("lm_pdf_yesterday_sales"), `RM ${agg.yesterdaySales.toFixed(2)}`],
         [
@@ -407,7 +408,7 @@ function ReportContent(p: ReportContentProps) {
 
       y += 4;
       doc.setFontSize(13);
-      doc.text("Target Minggu", 14, y);
+      doc.text(t("lm_weeklyTarget"), 14, y);
       y += 7;
       doc.setFontSize(11);
       doc.text(`RM ${agg.weeklyRevenue.toFixed(2)} / RM ${p.weeklyTarget.toFixed(2)} (${weeklyPct.toFixed(0)}%)`, 16, y);
@@ -427,7 +428,7 @@ function ReportContent(p: ReportContentProps) {
 
       if (p.actions.length) {
         doc.setFontSize(13);
-        doc.text("Tindakan Esok", 14, y);
+        doc.text(t("lm_tomorrowActions"), 14, y);
         y += 7;
         doc.setFontSize(11);
         p.actions.forEach((a) => {
@@ -523,7 +524,7 @@ function ReportContent(p: ReportContentProps) {
                 <p className="text-4xl font-extrabold mt-2">{fmt(agg.netProfit)}</p>
                 <div className="mt-4 grid grid-cols-3 gap-2 text-center">
                   <Stat
-                    label="Jualan"
+                    label={t("lm_sales")}
                     value={fmt(agg.totalSales)}
                     delta={agg.salesChangePct}
                   />
@@ -877,37 +878,44 @@ function PastReportView({ date, boss, onBack, onClose }: { date: string; boss: s
 }
 
 // ============= Building blocks =============
-function buildWhatsAppText(args: {
+function buildWhatsAppText({
+  report,
+  aggregate: agg,
+  businessName,
+  weeklyTarget,
+  actions,
+  t,
+}: {
   report: NightlyReportRow | null;
   aggregate: DailyAggregate;
   businessName: string;
   weeklyTarget: number;
   actions: ActionItemRow[];
+  t: (key: string) => string;
 }) {
-  const { aggregate: agg, businessName, weeklyTarget, actions } = args;
   const d = new Date(agg.reportDate + "T00:00:00");
   const dateLine = `${dayNameMs(d)}, ${d.getDate()} ${monthNameMs(d)} ${d.getFullYear()}`;
   const arrow = agg.salesChangePct === null ? "" : agg.salesChangePct >= 0 ? "↑" : "↓";
   const pct = agg.salesChangePct === null ? "" : ` ${arrow}${Math.abs(agg.salesChangePct).toFixed(0)}%`;
   const weeklyPct = weeklyTarget > 0 ? (agg.weeklyRevenue / weeklyTarget) * 100 : 0;
 
-  let txt = `📊 *Laporan Malam WarkahBiz*\n📅 ${dateLine}\n🏪 ${businessName || "WarkahBiz"}\n\n`;
-  txt += `💰 *Jualan:* RM ${agg.totalSales.toFixed(2)}${pct}\n`;
-  txt += `💸 *Belanja:* RM ${agg.totalExpenses.toFixed(2)}\n`;
-  txt += `✅ *Untung:* RM ${agg.netProfit.toFixed(2)}\n\n`;
-  txt += `📈 *Target Minggu:* ${weeklyPct.toFixed(0)}% tercapai\n   RM ${agg.weeklyRevenue.toFixed(2)} / RM ${weeklyTarget.toFixed(2)}\n`;
+  let txt = `📊 *${t("lm_pdf_title")}*\n📅 ${dateLine}\n🏪 ${businessName || "WarkahBiz"}\n\n`;
+  txt += `💰 *${t("lm_sales")}:* RM ${agg.totalSales.toFixed(2)}${pct}\n`;
+  txt += `💸 *${t("lm_expenses")}:* RM ${agg.totalExpenses.toFixed(2)}\n`;
+  txt += `✅ *${t("lm_netProfit")}:* RM ${agg.netProfit.toFixed(2)}\n\n`;
+  txt += `📈 *${t("lm_weeklyTarget")}:* ${weeklyPct.toFixed(0)}% tercapai\n   RM ${agg.weeklyRevenue.toFixed(2)} / RM ${weeklyTarget.toFixed(2)}\n`;
 
   if (agg.criticalItems.length) {
-    txt += `\n⚠️ *Stok Kritikal:*\n`;
+    txt += `\n⚠️ *${t("lm_pdf_critical_stock")}:*\n`;
     agg.criticalItems.forEach((i) => { txt += `• ${i.name}: ${i.qty} ${i.unit}\n`; });
   }
 
   if (actions.length) {
-    txt += `\n📋 *Esok:*\n`;
+    txt += `\n📋 *${t("lm_tomorrowActions")}:*\n`;
     actions.forEach((a) => { txt += `• ${a.action_text}\n`; });
   }
 
-  txt += `\n_Dijana oleh WarkahBiz_ 🚀`;
+  txt += `\n_${t("lm_pdf_footer")}_ 🚀`;
   return txt;
 }
 
