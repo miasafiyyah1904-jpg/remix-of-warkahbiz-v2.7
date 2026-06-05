@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useState } from "react";
 import type { Tab } from "@/types";
-import { useTranslation } from "@/hooks/useTranslation";
+import { useTranslation } from "@/context/LanguageContext";
 
 type Step = {
   selector: string;
@@ -16,9 +16,19 @@ interface Props {
 }
 
 export default function OnboardingTutorial({ userId, onComplete, onNavigate }: Props) {
+  const { t } = useTranslation();
   const [step, setStep] = useState(0);
   const [done, setDone] = useState(false);
   const [rect, setRect] = useState<DOMRect | null>(null);
+
+  const STEPS: Step[] = [
+    { selector: '[data-tutorial="tab-profile"]',  title: t("tut_step1_title"), body: t("tut_step1_body"), navigateTo: "today" },
+    { selector: '[data-tutorial="menu-products"]', title: t("tut_step2_title"), body: t("tut_step2_body"), navigateTo: "profile" },
+    { selector: '[data-tutorial="fab-add"]',       title: t("tut_step3_title"), body: t("tut_step3_body"), navigateTo: "today" },
+    { selector: '[data-tutorial="tab-bekalan"]',   title: t("tut_step4_title"), body: t("tut_step4_body"), navigateTo: "bekalan" },
+    { selector: '[data-tutorial="tab-log"]',       title: t("tut_step5_title"), body: t("tut_step5_body"), navigateTo: "log" },
+    { selector: '[data-tutorial="tab-ai"]',        title: t("tut_step6_title"), body: t("tut_step6_body"), navigateTo: "log" },
+  ];
 
   const current = STEPS[step];
 
@@ -42,7 +52,7 @@ export default function OnboardingTutorial({ userId, onComplete, onNavigate }: P
       }
     };
     // Wait a tick for tab content to render
-    const t = setTimeout(() => {
+    const timer = setTimeout(() => {
       measure();
       raf = requestAnimationFrame(measure);
     }, 250);
@@ -50,7 +60,7 @@ export default function OnboardingTutorial({ userId, onComplete, onNavigate }: P
     window.addEventListener("resize", onResize);
     window.addEventListener("scroll", onResize, true);
     return () => {
-      clearTimeout(t);
+      clearTimeout(timer);
       cancelAnimationFrame(raf);
       window.removeEventListener("resize", onResize);
       window.removeEventListener("scroll", onResize, true);
