@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useState } from "react";
 import type { Tab } from "@/types";
+import { useTranslation } from "@/hooks/useTranslation";
 
 type Step = {
   selector: string;
@@ -7,45 +8,6 @@ type Step = {
   body: string;
   navigateTo?: Tab;
 };
-
-const STEPS: Step[] = [
-  {
-    selector: '[data-tutorial="tab-profile"]',
-    title: "👤 Mula di sini — Profil Anda",
-    body: "Masukkan nama bisnes, jenis kedai, dan muat naik gambar profil anda. Ini adalah langkah pertama sebelum anda mula guna app.",
-    navigateTo: "today",
-  },
-  {
-    selector: '[data-tutorial="menu-products"]',
-    title: "🛍️ Tambah Produk Anda",
-    body: "Tambah produk yang anda jual. Masukkan nama, bahan-bahan, dan harga — app akan kira kos dan untung untuk anda.",
-    navigateTo: "profile",
-  },
-  {
-    selector: '[data-tutorial="fab-add"]',
-    title: "💰 Rekod Jualan & Belanja",
-    body: "Setiap hari, rekod duit yang masuk (Dapat Duit) dan duit yang keluar (Pembelian). Anda juga boleh imbas resit terus.",
-    navigateTo: "today",
-  },
-  {
-    selector: '[data-tutorial="tab-bekalan"]',
-    title: "📦 Urus Stok Bahan",
-    body: "Tab Bekalan tunjukkan senarai bahan yang perlu dibeli berdasarkan produk anda. Tandakan bahan yang dah dibeli dan kongsi senarai dengan pembekal.",
-    navigateTo: "bekalan",
-  },
-  {
-    selector: '[data-tutorial="tab-log"]',
-    title: "🧾 Log Kos Operasi",
-    body: "Rekod kos tetap seperti utiliti, sewa, gaji, pengangkutan dan lesen di sini supaya untung bersih anda lebih tepat.",
-    navigateTo: "log",
-  },
-  {
-    selector: '[data-tutorial="tab-ai"]',
-    title: "📊 Rekod & Tanya AI",
-    body: "Lihat sejarah kewangan penuh di tab Rekod. Gunakan Tanya AI untuk dapatkan jawapan tentang bisnes anda — keuntungan, cadangan, dan lebih lagi.",
-    navigateTo: "log",
-  },
-];
 
 interface Props {
   userId: string;
