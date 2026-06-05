@@ -880,7 +880,7 @@ function PastReportView({ date, boss, onBack, onClose }: { date: string; boss: s
 // ============= Building blocks =============
 function buildWhatsAppText({
   report,
-  aggregate,
+  aggregate: agg,
   businessName,
   weeklyTarget,
   actions,
@@ -893,7 +893,6 @@ function buildWhatsAppText({
   actions: ActionItemRow[];
   t: (key: string) => string;
 }) {
-  const { aggregate: agg, businessName: bn, weeklyTarget: wt, actions: act } = { report, aggregate, businessName, weeklyTarget, actions };
   const d = new Date(agg.reportDate + "T00:00:00");
   const dateLine = `${dayNameMs(d)}, ${d.getDate()} ${monthNameMs(d)} ${d.getFullYear()}`;
   const arrow = agg.salesChangePct === null ? "" : agg.salesChangePct >= 0 ? "↑" : "↓";
