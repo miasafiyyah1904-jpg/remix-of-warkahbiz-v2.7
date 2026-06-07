@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { ArrowLeft, Copy, Calculator } from "lucide-react";
 import { toast } from "sonner";
 import { fmt } from "@/lib/format";
+import { useTranslation } from "@/context/LanguageContext";
 
 const segBtn = (active: boolean) =>
   `flex-1 h-11 rounded-xl text-xs font-bold tap transition-all duration-150 ${
@@ -39,6 +40,7 @@ type WageType = "monthly" | "daily";
 const r2 = (n: number) => Math.round(n * 100) / 100;
 
 export function SalaryCalculator({ onBack }: { onBack: () => void }) {
+  const { t } = useTranslation();
   const [grossInput, setGrossInput] = useState<string>("");
   const [daysInput, setDaysInput] = useState<string>("26");
   const [citizenship, setCitizenship] = useState<Citizenship>("local");

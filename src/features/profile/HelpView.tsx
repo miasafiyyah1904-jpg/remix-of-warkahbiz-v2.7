@@ -1,4 +1,5 @@
 import { ArrowLeft, MessageCircle, Mail } from "lucide-react";
+import { useTranslation } from "@/context/LanguageContext";
 import {
   Accordion,
   AccordionContent,
@@ -86,11 +87,12 @@ const GROUPS: Group[] = [
 ];
 
 export const HelpView = ({ onBack }: { onBack: () => void }) => {
+  const { t } = useTranslation();
   return (
     <div className="fixed inset-0 z-40 bg-background overflow-y-auto animate-fade-in">
       <div className="sticky top-0 z-10 bg-background/95 backdrop-blur border-b border-border px-5 py-3">
         <button onClick={onBack} className="text-xs font-bold text-primary tap mb-1 inline-flex items-center gap-1">
-          <ArrowLeft className="w-3 h-3" /> Kembali ke Profil
+          <ArrowLeft className="w-3 h-3" /> {t("prof_backToProfile")}
         </button>
         <h1 className="text-base font-extrabold">Bantuan & Soalan Lazim</h1>
       </div>
