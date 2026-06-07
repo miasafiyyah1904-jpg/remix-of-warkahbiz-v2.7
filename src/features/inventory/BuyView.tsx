@@ -189,13 +189,11 @@ export const BuyView = ({
           {t("bv_tipBody")}
         </p>
       </div>
-        </p>
-      </div>
 
       <div className="rounded-2xl border border-border bg-surface overflow-hidden">
         <div className="px-4 py-2 border-b border-border bg-surface-elevated flex items-center gap-2">
-          <span className="text-xs font-bold text-muted-foreground">📝 Senarai Nak Beli</span>
-          <span className="ml-auto text-[10px] text-muted-foreground">tap untuk edit</span>
+          <span className="text-xs font-bold text-muted-foreground">{t("bv_listTitle")}</span>
+          <span className="ml-auto text-[10px] text-muted-foreground">{t("bv_tapToEdit")}</span>
         </div>
 
         <div
