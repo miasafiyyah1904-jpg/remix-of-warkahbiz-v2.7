@@ -94,15 +94,15 @@ export const ProductsView = ({
       {products.length === 0 && (
         <div className="mx-5 mt-6 rounded-3xl bg-surface border border-border p-8 flex flex-col items-center text-center">
           <div className="text-5xl mb-3">🍽️</div>
-          <h3 className="font-extrabold text-base">Tambah produk jualan anda</h3>
+          <h3 className="font-extrabold text-base">{t("pv_emptyHeading")}</h3>
           <p className="text-xs text-muted-foreground mt-2 max-w-[280px]">
-            Senaraikan menu atau produk yang anda jual. AI akan anggar kos bahan & cadang harga jualan.
+            {t("pv_emptyBody")}
           </p>
           <button
             onClick={openNew}
             className="mt-5 h-11 px-5 rounded-2xl bg-gradient-profit text-profit-foreground text-sm font-bold tap shadow-card"
           >
-            + Tambah Produk Pertama
+            {t("pv_addFirst")}
           </button>
         </div>
       )}
@@ -327,7 +327,7 @@ const ProductDialog = ({
   }, [baseCostPerUnit, profitScale]);
 
   const handleSave = () => {
-    if (!name.trim()) { toast.error("Sila isi nama produk"); setStep(1); return; }
+    if (!name.trim()) { toast.error(t("pv_validationName")); setStep(1); return; }
     const packaging: ProductPackaging | undefined = packagingEnabled
       ? { type: packagingType.trim(), costPerUnit: packagingPerUnit }
       : undefined;
@@ -376,7 +376,7 @@ const ProductDialog = ({
         <DialogHeader className="px-5 pt-5 pb-3 border-b border-border">
           <DialogTitle className="text-base font-extrabold flex items-center gap-2">
             <span className="text-xl">{emoji}</span>
-            {initial ? "Edit Produk" : "Tambah Produk"}
+            {initial ? t("pv_editProductLabel") : t("pv_addProductLabel")}
           </DialogTitle>
           {/* 3-step Stepper */}
           <div className="mt-3 flex items-center gap-1.5">
@@ -523,7 +523,7 @@ const ProductDialog = ({
               <Button variant="outline" onClick={attemptClose} className="rounded-2xl">Batal</Button>
               <Button
                 onClick={() => {
-                  if (!name.trim()) { toast.error("Sila isi nama produk"); return; }
+                  if (!name.trim()) { toast.error(t("pv_validationName")); return; }
                   setStep(2);
                 }}
                 className="rounded-2xl bg-gradient-profit text-profit-foreground"
