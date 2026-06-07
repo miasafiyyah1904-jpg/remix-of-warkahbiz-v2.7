@@ -76,11 +76,11 @@ export const ProductsView = ({
       <div className="px-5 pt-6 pb-3 flex items-start justify-between gap-3">
         <div className="min-w-0">
           <button onClick={onBack} className="text-xs font-bold text-primary tap mb-1 inline-flex items-center gap-1">
-            <ArrowLeft className="w-3 h-3" /> Kembali ke Profil
+            <ArrowLeft className="w-3 h-3" /> {t("pv_backToProfile")}
           </button>
-          <h2 className="text-xl font-extrabold tracking-tight">Produk Saya 🍽️</h2>
+          <h2 className="text-xl font-extrabold tracking-tight">{t("pv_title")}</h2>
           <p className="text-xs text-muted-foreground mt-0.5">
-            {products.length === 0 ? "Belum ada produk" : `${products.length} produk`}
+            {products.length === 0 ? t("pv_noProducts") : t("pv_productCount").replace("{count}", String(products.length))}
           </p>
         </div>
         <button
@@ -146,7 +146,7 @@ export const ProductsView = ({
                       </div>
                     )}
                     {batchSize > 1 && (
-                      <div className="text-[11px] text-muted-foreground mt-1">📦 1 batch = {batchSize} {batchUnit}</div>
+                      <div className="text-[11px] text-muted-foreground mt-1">{t("pv_batchInfo").replace("{size}", String(batchSize)).replace("{unit}", batchUnit)}</div>
                     )}
                   </div>
                   <div className="flex flex-col gap-1 shrink-0">
@@ -199,7 +199,7 @@ export const ProductsView = ({
         onSave={(p) => {
           onSave(p);
           setSheetOpen(false);
-          toast.success(editing ? "Produk dikemaskini ✅" : "Produk ditambah ✅");
+          toast.success(editing ? t("pv_updateSuccess") : t("pv_addSuccess"));
         }}
       />
 
@@ -207,7 +207,7 @@ export const ProductsView = ({
         <div className="fixed inset-0 z-50 flex items-center justify-center p-5" onClick={() => setDeleteConfirm(null)}>
           <div className="absolute inset-0 bg-black/50" />
           <div className="relative w-full max-w-sm bg-surface rounded-3xl p-5 animate-pop-in" onClick={(e) => e.stopPropagation()}>
-            <h3 className="font-extrabold text-base">Padam produk ini?</h3>
+            <h3 className="font-extrabold text-base">{t("pv_deleteHeading")}</h3>
             <p className="text-xs text-muted-foreground mt-2">Tindakan ini tidak boleh dibatalkan.</p>
             <div className="grid grid-cols-2 gap-2 mt-4">
               <button onClick={() => setDeleteConfirm(null)} className="tap h-11 rounded-xl border border-border font-semibold">Batal</button>
