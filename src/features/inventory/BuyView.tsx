@@ -22,6 +22,7 @@ export const BuyView = ({
   onClearCompleted?: () => void;
   onGoToStock?: () => void;
 }) => {
+  const { t } = useTranslation();
   const undone = buy.filter((b) => !b.done);
   const done = buy.filter((b) => b.done);
 
@@ -112,7 +113,7 @@ export const BuyView = ({
       day: "numeric", month: "long", year: "numeric",
     });
     const lines = undone.map((b) => `[ ] ${b.name}`);
-    const text = `🛒 *Senarai Nak Beli - WarkahBiz*\n📅 ${date}\n\n${lines.join("\n")}\n\n_Dijana oleh WarkahBiz App_`;
+    const text = `${t("bv_waShare")}\n📅 ${date}\n\n${lines.join("\n")}\n\n${t("bv_waFooter")}`;
     if (navigator.share) {
       navigator.share({ text }).catch(() => navigator.clipboard?.writeText(text));
     } else {
