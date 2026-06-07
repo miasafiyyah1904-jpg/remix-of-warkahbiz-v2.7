@@ -595,12 +595,6 @@ const ProductDialog = ({
 // Batch Definition block (used inside Step 1)
 // ============================================================
 const SERVING_UNIT_OPTIONS = ["bungkus", "biji", "pcs", "pinggan", "cawan", "botol", "pek", "kotak"];
-const COOKING_FREQ_OPTIONS = [
-  { label: "Setiap hari", value: 1 },
-  { label: "Setiap 2 hari", value: 2 },
-  { label: "2x seminggu", value: 3.5 },
-  { label: "Seminggu sekali", value: 7 },
-];
 
 const BatchDefinitionBlock = ({
   servingsPerBatch, setServingsPerBatch,
@@ -613,11 +607,19 @@ const BatchDefinitionBlock = ({
   cookingFrequencyDays: number; setCookingFrequencyDays: (n: number) => void;
   batchesFromIngredients: number; setBatchesFromIngredients: (n: number) => void;
 }) => {
+  const { t } = useTranslation();
+  const COOKING_FREQ_OPTIONS = [
+    { label: t("pv_freq_daily"), value: 1 },
+    { label: t("pv_freq_2days"), value: 2 },
+    { label: t("pv_freq_2xweek"), value: 3.5 },
+    { label: t("pv_freq_weekly"), value: 7 },
+  ];
   const hasServings = servingsPerBatch > 0 && !!servingUnit;
   const showSummary =
     batchesFromIngredients > 0 && cookingFrequencyDays > 0 && servingsPerBatch > 0;
   const daysCover = batchesFromIngredients * cookingFrequencyDays;
   const totalOutput = batchesFromIngredients * servingsPerBatch;
+
 
   return (
     <div className="space-y-5">
