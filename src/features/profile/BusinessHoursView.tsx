@@ -214,7 +214,7 @@ export function BusinessHoursView({
       {/* Header */}
       <div className="px-5 pt-5 pb-3">
         <button onClick={onBack} className="text-xs font-bold text-primary tap mb-1 inline-flex items-center gap-1">
-          <ArrowLeft className="w-3 h-3" /> Kembali ke Profil
+          <ArrowLeft className="w-3 h-3" /> {t("prof_backToProfile")}
         </button>
         <div className="min-w-0">
           <h1 className="text-xl font-extrabold leading-tight">{t("businessHoursTitle") || "Waktu Operasi"}</h1>

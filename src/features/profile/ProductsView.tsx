@@ -57,6 +57,7 @@ export const ProductsView = ({
   onDelete: (id: string) => void;
   onBack: () => void;
 }) => {
+  const { t } = useTranslation();
   const [sheetOpen, setSheetOpen] = useState(false);
   const [editing, setEditing] = useState<Product | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
@@ -67,7 +68,7 @@ export const ProductsView = ({
   const handleDelete = (id: string) => {
     onDelete(id);
     setDeleteConfirm(null);
-    toast.success("Produk dipadam");
+    toast.success(t("pv_deleteSuccess"));
   };
 
   return (
@@ -75,11 +76,11 @@ export const ProductsView = ({
       <div className="px-5 pt-6 pb-3 flex items-start justify-between gap-3">
         <div className="min-w-0">
           <button onClick={onBack} className="text-xs font-bold text-primary tap mb-1 inline-flex items-center gap-1">
-            <ArrowLeft className="w-3 h-3" /> Kembali ke Profil
+            <ArrowLeft className="w-3 h-3" /> {t("pv_backToProfile")}
           </button>
-          <h2 className="text-xl font-extrabold tracking-tight">Produk Saya 🍽️</h2>
+          <h2 className="text-xl font-extrabold tracking-tight">{t("pv_title")}</h2>
           <p className="text-xs text-muted-foreground mt-0.5">
-            {products.length === 0 ? "Belum ada produk" : `${products.length} produk`}
+            {products.length === 0 ? t("pv_noProducts") : t("pv_productCount").replace("{count}", String(products.length))}
           </p>
         </div>
         <button
@@ -93,15 +94,15 @@ export const ProductsView = ({
       {products.length === 0 && (
         <div className="mx-5 mt-6 rounded-3xl bg-surface border border-border p-8 flex flex-col items-center text-center">
           <div className="text-5xl mb-3">🍽️</div>
-          <h3 className="font-extrabold text-base">Tambah produk jualan anda</h3>
+          <h3 className="font-extrabold text-base">{t("pv_emptyHeading")}</h3>
           <p className="text-xs text-muted-foreground mt-2 max-w-[280px]">
-            Senaraikan menu atau produk yang anda jual. AI akan anggar kos bahan & cadang harga jualan.
+            {t("pv_emptyBody")}
           </p>
           <button
             onClick={openNew}
             className="mt-5 h-11 px-5 rounded-2xl bg-gradient-profit text-profit-foreground text-sm font-bold tap shadow-card"
           >
-            + Tambah Produk Pertama
+            {t("pv_addFirst")}
           </button>
         </div>
       )}
@@ -145,7 +146,7 @@ export const ProductsView = ({
                       </div>
                     )}
                     {batchSize > 1 && (
-                      <div className="text-[11px] text-muted-foreground mt-1">📦 1 batch = {batchSize} {batchUnit}</div>
+                      <div className="text-[11px] text-muted-foreground mt-1">{t("pv_batchInfo").replace("{size}", String(batchSize)).replace("{unit}", batchUnit)}</div>
                     )}
                   </div>
                   <div className="flex flex-col gap-1 shrink-0">
@@ -198,7 +199,7 @@ export const ProductsView = ({
         onSave={(p) => {
           onSave(p);
           setSheetOpen(false);
-          toast.success(editing ? "Produk dikemaskini ✅" : "Produk ditambah ✅");
+          toast.success(editing ? t("pv_updateSuccess") : t("pv_addSuccess"));
         }}
       />
 
@@ -206,7 +207,7 @@ export const ProductsView = ({
         <div className="fixed inset-0 z-50 flex items-center justify-center p-5" onClick={() => setDeleteConfirm(null)}>
           <div className="absolute inset-0 bg-black/50" />
           <div className="relative w-full max-w-sm bg-surface rounded-3xl p-5 animate-pop-in" onClick={(e) => e.stopPropagation()}>
-            <h3 className="font-extrabold text-base">Padam produk ini?</h3>
+            <h3 className="font-extrabold text-base">{t("pv_deleteHeading")}</h3>
             <p className="text-xs text-muted-foreground mt-2">Tindakan ini tidak boleh dibatalkan.</p>
             <div className="grid grid-cols-2 gap-2 mt-4">
               <button onClick={() => setDeleteConfirm(null)} className="tap h-11 rounded-xl border border-border font-semibold">Batal</button>
@@ -326,7 +327,7 @@ const ProductDialog = ({
   }, [baseCostPerUnit, profitScale]);
 
   const handleSave = () => {
-    if (!name.trim()) { toast.error("Sila isi nama produk"); setStep(1); return; }
+    if (!name.trim()) { toast.error(t("pv_validationName")); setStep(1); return; }
     const packaging: ProductPackaging | undefined = packagingEnabled
       ? { type: packagingType.trim(), costPerUnit: packagingPerUnit }
       : undefined;
@@ -375,7 +376,7 @@ const ProductDialog = ({
         <DialogHeader className="px-5 pt-5 pb-3 border-b border-border">
           <DialogTitle className="text-base font-extrabold flex items-center gap-2">
             <span className="text-xl">{emoji}</span>
-            {initial ? "Edit Produk" : "Tambah Produk"}
+            {initial ? t("pv_editProductLabel") : t("pv_addProductLabel")}
           </DialogTitle>
           {/* 3-step Stepper */}
           <div className="mt-3 flex items-center gap-1.5">
@@ -522,7 +523,7 @@ const ProductDialog = ({
               <Button variant="outline" onClick={attemptClose} className="rounded-2xl">Batal</Button>
               <Button
                 onClick={() => {
-                  if (!name.trim()) { toast.error("Sila isi nama produk"); return; }
+                  if (!name.trim()) { toast.error(t("pv_validationName")); return; }
                   setStep(2);
                 }}
                 className="rounded-2xl bg-gradient-profit text-profit-foreground"
@@ -594,12 +595,6 @@ const ProductDialog = ({
 // Batch Definition block (used inside Step 1)
 // ============================================================
 const SERVING_UNIT_OPTIONS = ["bungkus", "biji", "pcs", "pinggan", "cawan", "botol", "pek", "kotak"];
-const COOKING_FREQ_OPTIONS = [
-  { label: "Setiap hari", value: 1 },
-  { label: "Setiap 2 hari", value: 2 },
-  { label: "2x seminggu", value: 3.5 },
-  { label: "Seminggu sekali", value: 7 },
-];
 
 const BatchDefinitionBlock = ({
   servingsPerBatch, setServingsPerBatch,
@@ -612,11 +607,19 @@ const BatchDefinitionBlock = ({
   cookingFrequencyDays: number; setCookingFrequencyDays: (n: number) => void;
   batchesFromIngredients: number; setBatchesFromIngredients: (n: number) => void;
 }) => {
+  const { t } = useTranslation();
+  const COOKING_FREQ_OPTIONS = [
+    { label: t("pv_freq_daily"), value: 1 },
+    { label: t("pv_freq_2days"), value: 2 },
+    { label: t("pv_freq_2xweek"), value: 3.5 },
+    { label: t("pv_freq_weekly"), value: 7 },
+  ];
   const hasServings = servingsPerBatch > 0 && !!servingUnit;
   const showSummary =
     batchesFromIngredients > 0 && cookingFrequencyDays > 0 && servingsPerBatch > 0;
   const daysCover = batchesFromIngredients * cookingFrequencyDays;
   const totalOutput = batchesFromIngredients * servingsPerBatch;
+
 
   return (
     <div className="space-y-5">
@@ -629,7 +632,7 @@ const BatchDefinitionBlock = ({
           💡 Berapa hidangan boleh anda hasilkan setiap kali memasak?
         </div>
         <div className="grid grid-cols-2 gap-2">
-          <Field label="Bilangan hidangan">
+          <Field label={t("pv_servingsLabel")}>
             <Input
               type="number"
               inputMode="numeric"
@@ -642,7 +645,7 @@ const BatchDefinitionBlock = ({
               className="h-12 rounded-2xl text-base font-bold"
             />
           </Field>
-          <Field label="Unit">
+          <Field label={t("pv_unitLabel")}>
             <div className="relative">
               <select
                 value={servingUnit}
@@ -671,7 +674,7 @@ const BatchDefinitionBlock = ({
         <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
           Kekerapan Masak 🔄
         </div>
-        <Field label="Berapa kerap anda masak?">
+        <Field label={t("pv_cookFreqLabel")}>
           <div className="relative">
             <select
               value={cookingFrequencyDays}
@@ -1033,7 +1036,7 @@ const BasicInfoStep = ({
             {uploading ? (
               <span className="flex items-center gap-2"><Loader2 className="w-4 h-4 animate-spin" /> Memuat naik…</span>
             ) : (
-              "📷 Muat naik gambar produk"
+              t("pv_uploadPhoto")
             )}
           </button>
         )}
@@ -1214,7 +1217,7 @@ const IngredientsStep = ({
             <p className="text-xs text-muted-foreground">{t("noIngredientsYet")}</p>
             <div className="flex items-center justify-center gap-2 mt-3">
               <Button onClick={add} className="rounded-2xl bg-gradient-profit text-profit-foreground" size="sm">
-                <Plus className="w-4 h-4" /> Tambah Bahan
+                <Plus className="w-4 h-4" /> {t("pv_addIngredientBtn")}
               </Button>
               <Button onClick={() => addMany(5)} variant="outline" className="rounded-2xl" size="sm">
                 +5 baris kosong

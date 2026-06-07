@@ -2,6 +2,7 @@ import { useMemo, useRef, useEffect } from "react";
 import { Check, Share2 } from "lucide-react";
 import type { BuyItem, StockItem, Product, Unit } from "@/types";
 import { emojiForItem } from "@/lib/stockEmoji";
+import { useTranslation } from "@/context/LanguageContext";
 
 export const BuyView = ({
   buy,
@@ -21,6 +22,7 @@ export const BuyView = ({
   onClearCompleted?: () => void;
   onGoToStock?: () => void;
 }) => {
+  const { t } = useTranslation();
   const undone = buy.filter((b) => !b.done);
   const done = buy.filter((b) => b.done);
 
@@ -111,7 +113,7 @@ export const BuyView = ({
       day: "numeric", month: "long", year: "numeric",
     });
     const lines = undone.map((b) => `[ ] ${b.name}`);
-    const text = `🛒 *Senarai Nak Beli - WarkahBiz*\n📅 ${date}\n\n${lines.join("\n")}\n\n_Dijana oleh WarkahBiz App_`;
+    const text = `${t("bv_waShare")}\n📅 ${date}\n\n${lines.join("\n")}\n\n${t("bv_waFooter")}`;
     if (navigator.share) {
       navigator.share({ text }).catch(() => navigator.clipboard?.writeText(text));
     } else {
@@ -158,7 +160,7 @@ export const BuyView = ({
         onBlur={() => {
           if (b.name.trim() === "") removeItem(b.id);
         }}
-        placeholder="Tulis item..."
+        placeholder={t("bv_itemPlaceholder")}
         className={`flex-1 bg-transparent text-sm font-medium focus:outline-none placeholder:text-muted-foreground/40 ${
           b.done ? "line-through text-muted-foreground" : ""
         }`}
@@ -169,9 +171,9 @@ export const BuyView = ({
   return (
     <div className="px-5 pt-6 space-y-4 pb-32">
       <header className="animate-fade-in">
-        <h1 className="text-2xl font-extrabold tracking-tight">Nak Beli 🛒</h1>
+        <h1 className="text-2xl font-extrabold tracking-tight">{t("bv_title")}</h1>
         <div className="text-xs font-semibold text-muted-foreground mt-2">
-          {doneCount} / {total} selesai
+          {t("bv_progress").replace("{done}", String(doneCount)).replace("{total}", String(total))}
         </div>
         <div className="mt-1 h-2 rounded-full bg-surface overflow-hidden">
           <div
@@ -182,17 +184,16 @@ export const BuyView = ({
       </header>
 
       <div className="rounded-2xl bg-surface-elevated border-l-4 border-warn p-4 animate-fade-in">
-        <div className="text-sm font-extrabold mb-1">📌 Tip Pembelian</div>
+        <div className="text-sm font-extrabold mb-1">{t("bv_tipTitle")}</div>
         <p className="text-xs text-muted-foreground leading-relaxed">
-          Bila dah beli barang, tekan butang <span className="font-bold text-foreground">+</span> di bawah → pilih{" "}
-          <span className="font-bold text-foreground">"Pembelian"</span> untuk rekod harga dan kemaskini stok secara automatik.
+          {t("bv_tipBody")}
         </p>
       </div>
 
       <div className="rounded-2xl border border-border bg-surface overflow-hidden">
         <div className="px-4 py-2 border-b border-border bg-surface-elevated flex items-center gap-2">
-          <span className="text-xs font-bold text-muted-foreground">📝 Senarai Nak Beli</span>
-          <span className="ml-auto text-[10px] text-muted-foreground">tap untuk edit</span>
+          <span className="text-xs font-bold text-muted-foreground">{t("bv_listTitle")}</span>
+          <span className="ml-auto text-[10px] text-muted-foreground">{t("bv_tapToEdit")}</span>
         </div>
 
         <div

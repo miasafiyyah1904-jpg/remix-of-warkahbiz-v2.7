@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { ArrowLeft, Copy, Calculator } from "lucide-react";
 import { toast } from "sonner";
 import { fmt } from "@/lib/format";
+import { useTranslation } from "@/context/LanguageContext";
 
 const segBtn = (active: boolean) =>
   `flex-1 h-11 rounded-xl text-xs font-bold tap transition-all duration-150 ${
@@ -39,6 +40,7 @@ type WageType = "monthly" | "daily";
 const r2 = (n: number) => Math.round(n * 100) / 100;
 
 export function SalaryCalculator({ onBack }: { onBack: () => void }) {
+  const { t } = useTranslation();
   const [grossInput, setGrossInput] = useState<string>("");
   const [daysInput, setDaysInput] = useState<string>("26");
   const [citizenship, setCitizenship] = useState<Citizenship>("local");
@@ -133,7 +135,7 @@ export function SalaryCalculator({ onBack }: { onBack: () => void }) {
       {/* Header */}
       <div className="px-5 pt-5 pb-3">
         <button onClick={onBack} className="text-xs font-bold text-primary tap mb-1 inline-flex items-center gap-1">
-          <ArrowLeft className="w-3 h-3" /> Kembali ke Profil
+          <ArrowLeft className="w-3 h-3" /> {t("prof_backToProfile")}
         </button>
         <div className="min-w-0">
           <h1 className="text-xl font-extrabold leading-tight inline-flex items-center gap-2">
