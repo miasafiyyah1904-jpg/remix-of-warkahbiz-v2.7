@@ -1036,7 +1036,7 @@ const BasicInfoStep = ({
             {uploading ? (
               <span className="flex items-center gap-2"><Loader2 className="w-4 h-4 animate-spin" /> Memuat naik…</span>
             ) : (
-              "📷 Muat naik gambar produk"
+              t("pv_uploadPhoto")
             )}
           </button>
         )}
@@ -1217,7 +1217,7 @@ const IngredientsStep = ({
             <p className="text-xs text-muted-foreground">{t("noIngredientsYet")}</p>
             <div className="flex items-center justify-center gap-2 mt-3">
               <Button onClick={add} className="rounded-2xl bg-gradient-profit text-profit-foreground" size="sm">
-                <Plus className="w-4 h-4" /> Tambah Bahan
+                <Plus className="w-4 h-4" /> {t("pv_addIngredientBtn")}
               </Button>
               <Button onClick={() => addMany(5)} variant="outline" className="rounded-2xl" size="sm">
                 +5 baris kosong
