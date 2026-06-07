@@ -632,7 +632,7 @@ const BatchDefinitionBlock = ({
           💡 Berapa hidangan boleh anda hasilkan setiap kali memasak?
         </div>
         <div className="grid grid-cols-2 gap-2">
-          <Field label="Bilangan hidangan">
+          <Field label={t("pv_servingsLabel")}>
             <Input
               type="number"
               inputMode="numeric"
@@ -645,7 +645,7 @@ const BatchDefinitionBlock = ({
               className="h-12 rounded-2xl text-base font-bold"
             />
           </Field>
-          <Field label="Unit">
+          <Field label={t("pv_unitLabel")}>
             <div className="relative">
               <select
                 value={servingUnit}
@@ -674,7 +674,7 @@ const BatchDefinitionBlock = ({
         <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
           Kekerapan Masak 🔄
         </div>
-        <Field label="Berapa kerap anda masak?">
+        <Field label={t("pv_cookFreqLabel")}>
           <div className="relative">
             <select
               value={cookingFrequencyDays}
