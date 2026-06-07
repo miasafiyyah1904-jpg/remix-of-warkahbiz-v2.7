@@ -57,6 +57,7 @@ export const ProductsView = ({
   onDelete: (id: string) => void;
   onBack: () => void;
 }) => {
+  const { t } = useTranslation();
   const [sheetOpen, setSheetOpen] = useState(false);
   const [editing, setEditing] = useState<Product | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
@@ -67,7 +68,7 @@ export const ProductsView = ({
   const handleDelete = (id: string) => {
     onDelete(id);
     setDeleteConfirm(null);
-    toast.success("Produk dipadam");
+    toast.success(t("pv_deleteSuccess"));
   };
 
   return (
