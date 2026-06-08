@@ -20,6 +20,7 @@ export interface Txn {
   createdAt?: string; // ISO date string
   category?: TxnCategory;
   notes?: string;
+  soldItems?: { productId: string; qty: number }[];
 }
 
 

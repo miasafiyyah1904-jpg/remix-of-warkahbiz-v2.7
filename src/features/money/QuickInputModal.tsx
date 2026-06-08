@@ -107,6 +107,7 @@ export const QuickInputModal = ({ onClose, onSave, onUpdate, onReceiptConfirm, o
         amount: parseFloat(total.toFixed(2)),
         category: categoryIn,
         notes: note,
+        soldItems: entries.map(([productId, qty]) => ({ productId, qty })),
       });
       onClose();
     }, 800);
@@ -326,12 +327,12 @@ export const QuickInputModal = ({ onClose, onSave, onUpdate, onReceiptConfirm, o
           </div>
         )}
 
-        {!isEditing && !confirming && (
+        {!isEditing && !confirming && inMode !== "pos" && (
 
           <div className="px-5 mt-2">
             <div className="rounded-2xl p-1 bg-surface-elevated grid grid-cols-2 gap-1">
               <button
-                onClick={() => setMode("in")}
+                onClick={() => { setMode("in"); setInMode("pick"); setCart({}); }}
                 className={`py-3 rounded-xl font-bold text-sm tap ${mode === "in" ? "bg-gradient-profit text-profit-foreground shadow-card" : "text-muted-foreground"}`}
               >
                 {t("qim_dapat_duit")}
