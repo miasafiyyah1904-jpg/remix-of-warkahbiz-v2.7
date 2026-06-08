@@ -50,6 +50,68 @@ export const QuickInputModal = ({ onClose, onSave, onUpdate, onReceiptConfirm, o
   const [success, setSuccess] = useState(false);
   const [scanner, setScanner] = useState(false);
 
+  // POS income mode
+  type InMode = "pick" | "manual" | "pos";
+  const [inMode, setInMode] = useState<InMode>(
+    !isEditing && (products?.length ?? 0) > 0 ? "pick" : "manual"
+  );
+  const [cart, setCart] = useState<Record<string, number>>({});
+  const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const longPressFired = useRef(false);
+
+  const priceOf = (p: Product) => p.suggestedPrice ?? p.sellingPrice ?? 0;
+  const cartUnits = Object.values(cart).reduce((s, q) => s + q, 0);
+  const cartTotal = Object.entries(cart).reduce((s, [pid, q]) => {
+    const p = products.find(x => x.id === pid);
+    return s + (p ? priceOf(p) : 0) * q;
+  }, 0);
+
+  const incrementProduct = (p: Product) => {
+    if (priceOf(p) <= 0) {
+      toast.error(t("pos_no_price_toast"));
+      return;
+    }
+    setCart(prev => ({ ...prev, [p.id]: (prev[p.id] ?? 0) + 1 }));
+  };
+  const decrementProduct = (p: Product) => {
+    setCart(prev => {
+      const cur = prev[p.id] ?? 0;
+      if (cur <= 0) return prev;
+      const next = { ...prev };
+      if (cur - 1 <= 0) delete next[p.id];
+      else next[p.id] = cur - 1;
+      toast(t("pos_decrement_toast").replace("{name}", p.name));
+      return next;
+    });
+  };
+
+  const handleSavePOS = () => {
+    const entries = Object.entries(cart).filter(([, qty]) => qty > 0);
+    if (entries.length === 0) return;
+    const total = entries.reduce((sum, [productId, qty]) => {
+      const p = products.find(x => x.id === productId);
+      const price = p?.suggestedPrice ?? p?.sellingPrice ?? 0;
+      return sum + price * qty;
+    }, 0);
+    if (total <= 0) return;
+    const label = entries.map(([productId, qty]) => {
+      const p = products.find(x => x.id === productId);
+      return `${p?.name ?? productId}${qty > 1 ? ` ×${qty}` : ""}`;
+    }).join(", ");
+    setSuccess(true);
+    setTimeout(() => {
+      onSave({
+        type: "in",
+        emoji: "🛍️",
+        label,
+        amount: parseFloat(total.toFixed(2)),
+        category: categoryIn,
+        notes: note,
+      });
+      onClose();
+    }, 800);
+  };
+
   // Multi-item purchase session
   const [items, setItems] = useState<PurchaseLine[]>([]);
   const [outMode, setOutMode] = useState<OutMode>("choose");
