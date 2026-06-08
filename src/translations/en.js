@@ -1175,5 +1175,18 @@ export default {
   pv_freq_weekly: "Once a week",
   // Shared profile subviews
   prof_backToProfile: "← Back to Profile",
+  // POS mode
+  pos_pick_heading: "Record sale as?",
+  pos_card_product_title: "Pick Product",
+  pos_card_product_sub: "Tap a product to add to cart — price calculated automatically",
+  pos_card_manual_title: "Type Amount",
+  pos_card_manual_sub: "Enter the sale amount directly",
+  pos_screen_title: "Pick Product",
+  pos_cart_items: "{n} item",
+  pos_no_price: "No price set",
+  pos_no_price_toast: "This product has no price. Update it in Profile → My Products.",
+  pos_save_button: "Save Sale  ·  RM {total}",
+  pos_back_to_pick: "← Choose method",
+  pos_decrement_toast: "Removed 1 {name}",
 };
 
