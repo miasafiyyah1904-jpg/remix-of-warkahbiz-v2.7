@@ -1174,5 +1174,18 @@ export default {
   pv_freq_weekly: "Seminggu sekali",
   // Shared profile subviews
   prof_backToProfile: "← Kembali ke Profil",
+  // POS mode
+  pos_pick_heading: "Rekod jualan sebagai?",
+  pos_card_product_title: "Pilih Produk",
+  pos_card_product_sub: "Tap produk untuk tambah ke troli — harga dikira otomatik",
+  pos_card_manual_title: "Taip Jumlah",
+  pos_card_manual_sub: "Masukkan jumlah jualan terus",
+  pos_screen_title: "Pilih Produk",
+  pos_cart_items: "{n} item",
+  pos_no_price: "Tiada harga",
+  pos_no_price_toast: "Produk ini tiada harga. Sila kemaskini dalam Profil → Produk Saya.",
+  pos_save_button: "Simpan Jualan  ·  RM {total}",
+  pos_back_to_pick: "← Tukar cara",
+  pos_decrement_toast: "Kurangkan 1 {name}",
 };
 
