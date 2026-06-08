@@ -1,5 +1,6 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { X, Check, Delete, Camera, Plus, Trash2, ArrowLeft } from "lucide-react";
+import { toast } from "sonner";
 import type { Txn, TxnType, ReceiptItem, Product, Unit, TxnCategory } from "@/types";
 import { TXN_CATEGORIES, defaultTxnCategory } from "@/types";
 import { ReceiptScanner } from "@/features/inventory/ReceiptScanner";
