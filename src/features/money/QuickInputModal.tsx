@@ -667,10 +667,125 @@ export const QuickInputModal = ({ onClose, onSave, onUpdate, onReceiptConfirm, o
           </div>
         )}
 
-        {/* INCOME MODE */}
-        {!isEditing && mode === "in" && !confirming && (
+        {/* INCOME MODE - PICK */}
+        {!isEditing && mode === "in" && !confirming && inMode === "pick" && (
+          <div className="flex flex-col flex-1 overflow-hidden">
+            <div className="flex-1 overflow-y-auto px-5 mt-6 space-y-4 pb-6 animate-fade-in">
+              <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground text-center">
+                {t("pos_pick_heading")}
+              </div>
+              <button
+                onClick={() => setInMode("pos")}
+                className="w-full rounded-3xl p-5 bg-profit/10 border-2 border-profit/30 tap flex items-center gap-4 text-left"
+              >
+                <div className="w-14 h-14 rounded-2xl bg-profit/20 grid place-items-center text-3xl shrink-0">🛍️</div>
+                <div className="flex-1">
+                  <div className="text-base font-extrabold">{t("pos_card_product_title")}</div>
+                  <div className="text-xs text-muted-foreground mt-1">{t("pos_card_product_sub")}</div>
+                </div>
+              </button>
+              <button
+                onClick={() => setInMode("manual")}
+                className="w-full rounded-3xl p-5 bg-surface-elevated border border-border tap flex items-center gap-4 text-left"
+              >
+                <div className="w-14 h-14 rounded-2xl bg-background grid place-items-center text-3xl shrink-0">🔢</div>
+                <div className="flex-1">
+                  <div className="text-base font-extrabold">{t("pos_card_manual_title")}</div>
+                  <div className="text-xs text-muted-foreground mt-1">{t("pos_card_manual_sub")}</div>
+                </div>
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* INCOME MODE - POS GRID */}
+        {!isEditing && mode === "in" && !confirming && inMode === "pos" && (
+          <div className="flex flex-col flex-1 overflow-hidden">
+            <div className="px-5 mt-4 flex items-center gap-3">
+              <button
+                onClick={() => { setInMode("pick"); setCart({}); }}
+                className="w-9 h-9 rounded-full bg-surface-elevated grid place-items-center tap"
+              >
+                <ArrowLeft className="w-4 h-4" />
+              </button>
+              <div className="text-base font-extrabold">{t("pos_screen_title")}</div>
+            </div>
+
+            {cartUnits > 0 && (
+              <div className="px-5 mt-3">
+                <div className="rounded-2xl bg-profit/10 border border-profit/30 px-4 py-2.5 flex items-center justify-between">
+                  <span className="text-sm font-semibold">{t("pos_cart_items").replace("{n}", String(cartUnits))}</span>
+                  <span className="text-base font-extrabold text-profit">RM {cartTotal.toFixed(2)}</span>
+                </div>
+              </div>
+            )}
+
+            <div className="flex-1 overflow-y-auto px-5 mt-3 pb-4">
+              <div className="grid grid-cols-2 gap-3">
+                {products.map(p => {
+                  const price = priceOf(p);
+                  const qty = cart[p.id] ?? 0;
+                  const hasPrice = price > 0;
+                  return (
+                    <button
+                      key={p.id}
+                      onClick={() => { if (!longPressFired.current) incrementProduct(p); longPressFired.current = false; }}
+                      onContextMenu={(e) => { e.preventDefault(); if (qty > 0) decrementProduct(p); }}
+                      onPointerDown={() => {
+                        longPressFired.current = false;
+                        if (longPressTimer.current) clearTimeout(longPressTimer.current);
+                        longPressTimer.current = setTimeout(() => {
+                          longPressFired.current = true;
+                          if ((cart[p.id] ?? 0) > 0) decrementProduct(p);
+                        }, 500);
+                      }}
+                      onPointerUp={() => { if (longPressTimer.current) clearTimeout(longPressTimer.current); }}
+                      onPointerLeave={() => { if (longPressTimer.current) clearTimeout(longPressTimer.current); }}
+                      className={`relative rounded-2xl p-3 bg-surface-elevated border-2 tap flex flex-col items-center gap-1 ${qty > 0 ? "border-profit" : "border-border"}`}
+                    >
+                      {qty > 0 && (
+                        <span className="absolute top-1.5 right-1.5 min-w-[22px] h-[22px] px-1.5 rounded-full bg-profit text-profit-foreground text-[11px] font-extrabold grid place-items-center">
+                          {qty}
+                        </span>
+                      )}
+                      <div className="text-3xl">{p.emoji || "🍽️"}</div>
+                      <div className="text-xs font-bold text-center line-clamp-1 w-full">{p.name}</div>
+                      <div className={`text-xs font-semibold ${hasPrice ? "text-profit" : "text-muted-foreground"}`}>
+                        {hasPrice ? `RM ${price.toFixed(2)}` : t("pos_no_price")}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {cartUnits > 0 && (
+              <div className="px-5 pt-3 pb-6 shrink-0">
+                <button
+                  onClick={handleSavePOS}
+                  className="w-full h-14 rounded-2xl font-extrabold text-base tap shadow-card bg-gradient-profit text-profit-foreground"
+                >
+                  {t("pos_save_button").replace("{total}", cartTotal.toFixed(2))}
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* INCOME MODE - MANUAL */}
+        {!isEditing && mode === "in" && !confirming && inMode === "manual" && (
           <>
-            <div className="px-5 mt-5">
+            {products.length > 0 && (
+              <div className="px-5 mt-2">
+                <button
+                  onClick={() => setInMode("pick")}
+                  className="text-xs font-semibold text-muted-foreground tap"
+                >
+                  {t("pos_back_to_pick")}
+                </button>
+              </div>
+            )}
+            <div className="px-5 mt-3">
               <div className="rounded-3xl p-5 text-center bg-profit/10">
                 <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{t("qim_how_much_received")}</div>
                 <div className="text-5xl font-extrabold mt-2 text-profit">RM {amount}</div>
