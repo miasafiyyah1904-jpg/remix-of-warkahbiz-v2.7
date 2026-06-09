@@ -119,6 +119,7 @@ export const ProfileView = ({
       <ProductsView
         products={products}
         stock={stock}
+        finishedStock={finishedStock}
         onSave={onSaveProduct}
         onDelete={onDeleteProduct}
         onBack={() => setSub("home")}
