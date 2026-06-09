@@ -176,6 +176,20 @@ const Index = () => {
 
   const handleSaveTxn = (t: Omit<Txn, "id" | "ts" | "time">) => {
     setTxns((prev) => [...prev, { ...t, id: Date.now(), ts: Date.now(), time: nowTime(), createdAt: new Date().toISOString() }]);
+    if (t.type === "in" && t.soldItems && t.soldItems.length > 0) {
+      const nowIso = new Date().toISOString();
+      setFinishedStock(prev =>
+        prev.map(f => {
+          const sold = t.soldItems!.find(s => s.productId === f.productId);
+          if (!sold) return f;
+          return {
+            ...f,
+            qty: Math.max(0, f.qty - sold.qty),
+            lastUpdatedAt: nowIso,
+          };
+        })
+      );
+    }
   };
 
   // Track the highest qty ever recorded for each stock item (used to auto-derive minQty)
