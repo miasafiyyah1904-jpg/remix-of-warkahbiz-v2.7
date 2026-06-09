@@ -15,7 +15,7 @@ import { Slider } from "@/components/ui/slider";
 import { useTranslation } from "@/context/LanguageContext";
 import { estimateIngredientCost } from "@/lib/estimateCost.functions";
 import { multiplierFor, tierFor, tierLabelKey } from "./profitScale";
-import type { Product, ProductIngredient, ProductPackaging, StockItem, Unit } from "@/types";
+import type { Product, ProductIngredient, ProductPackaging, StockItem, Unit, FinishedStock } from "@/types";
 
 const UNITS: Unit[] = ["kg", "g", "gram", "liter", "ml", "biji", "pek", "paket", "kotak", "botol", "tin", "bungkus", "batang", "helai", "ikat", "tong", "papan", "kampit", "ekor", "sudu", "cawan", "unit", "pcs", "box", "pack", "dozen"];
 const BATCH_UNITS = ["biji", "pcs", "servings", "kotak", "pek", "botol", "balang", "helai", "ketul"];
