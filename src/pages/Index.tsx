@@ -241,6 +241,30 @@ const Index = () => {
         batchUnit: product.cookingUnit ?? product.batchUnit ?? "batch",
       })),
     ]);
+
+    entries.forEach(({ productId, batches }) => {
+      const product = products.find(p => p.id === productId);
+      if (!product || batches <= 0) return;
+      const servings = product.servingsPerBatch ?? product.batchSize ?? 1;
+      const produced = batches * servings;
+      setFinishedStock(prev => {
+        const existing = prev.find(f => f.productId === productId);
+        if (existing) {
+          return prev.map(f =>
+            f.productId === productId
+              ? { ...f, qty: f.qty + produced, lastUpdatedAt: nowIso }
+              : f
+          );
+        }
+        return [...prev, {
+          productId,
+          productName: product.name,
+          productEmoji: product.emoji,
+          qty: produced,
+          lastUpdatedAt: nowIso,
+        }];
+      });
+    });
   };
 
   const handleBought = (id: string) => setBuy((prev) => prev.map((b) => b.id === id ? { ...b, done: !b.done } : b));
