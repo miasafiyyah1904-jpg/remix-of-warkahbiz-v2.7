@@ -1192,5 +1192,8 @@ export default {
   sf_readyToSell: "Sedia jual",
   sf_readyQty: "{qty} unit sedia",
   home_recentTxns: "Aktiviti Hari Ini",
+  cookingLog_readyToSell: "Sedia jual",
+  fs_ready: "{qty} {unit} sedia",
+  fs_not_cooked: "Belum masak",
 };
 
