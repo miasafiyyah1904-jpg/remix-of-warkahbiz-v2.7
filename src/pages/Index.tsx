@@ -545,7 +545,7 @@ const Index = () => {
             </div>
           )}
           {tab === "log" && (
-            <LogView txns={txns} today={today} week={week} month={month} opex={opex} todayCogs={todayCogs} todayOtherOpex={todayOtherOpex} todayNetProfit={todayNetProfit} onExport={() => setExportOpen(true)} onExportReport={() => setReportOpen(true)} onOpenIncomeStatement={() => setIncomeStatementOpen(true)} onAddOpEx={handleAddOpEx} onEditTxn={(t) => { setEditingTxn(t); setModalOpen(true); }} />
+            <LogView txns={txns} today={today} week={week} month={month} opex={opex} todayCogs={todayCogs} todayOtherOpex={todayOtherOpex} todayNetProfit={todayNetProfit} onExport={() => setExportOpen(true)} onExportReport={() => setReportOpen(true)} onOpenIncomeStatement={() => setIncomeStatementOpen(true)} onAddOpEx={handleAddOpEx} onDeleteOpex={handleDeleteOpex} onEditTxn={(t) => { setEditingTxn(t); setModalOpen(true); }} />
           )}
           {tab === "ai" && (
             <ChatView messages={displayChat} onSend={handleSendChat} onClear={() => setChat([])} isLoading={chatLoading} txns={txns} stock={stock} opex={opex} petty={petty} businessName={businessName || profileName || "WarkahBiz"} products={products} />
