@@ -674,6 +674,7 @@ const Index = () => {
             products={products}
             stock={stock}
             cookingLog={cookingLog}
+            finishedStock={finishedStock}
             onClose={() => setCookingLogOpen(false)}
             onConfirm={handleLogCooking}
           />
