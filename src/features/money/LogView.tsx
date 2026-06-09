@@ -52,7 +52,7 @@ const MiniStat = ({ label, value, tone }: { label: string; value: number; tone: 
 
 type Filter = "all" | "in" | "out" | "opex" | "untung";
 
-export const LogView = ({ txns, today, week, month, opex, todayCogs, todayOtherOpex, todayNetProfit, onExport, onExportReport, onOpenIncomeStatement, onAddOpEx, onEditTxn }: {
+export const LogView = ({ txns, today, week, month, opex, todayCogs, todayOtherOpex, todayNetProfit, onExport, onExportReport, onOpenIncomeStatement, onAddOpEx, onDeleteOpex, onEditTxn }: {
   txns: Txn[];
   today: { in: number; out: number; profit: number };
   week: { in: number; out: number; profit: number };
@@ -65,6 +65,7 @@ export const LogView = ({ txns, today, week, month, opex, todayCogs, todayOtherO
   onExportReport: () => void;
   onOpenIncomeStatement?: () => void;
   onAddOpEx: (category: OpExCategory, amount: number, desc: string, paidFromPetty: boolean) => void;
+  onDeleteOpex: (id: number) => void;
   onEditTxn?: (t: Txn) => void;
 }) => {
 
