@@ -47,12 +47,14 @@ function niceRound(price: number) {
 export const ProductsView = ({
   products,
   stock = [],
+  finishedStock = [],
   onSave,
   onDelete,
   onBack,
 }: {
   products: Product[];
   stock?: StockItem[];
+  finishedStock?: FinishedStock[];
   onSave: (p: Product) => void;
   onDelete: (id: string) => void;
   onBack: () => void;
