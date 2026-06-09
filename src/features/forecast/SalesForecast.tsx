@@ -61,12 +61,14 @@ export function SalesForecast({
   txns,
   products,
   onSendToBuy,
+  finishedStock,
 }: {
   onClose: () => void;
   businessName: string;
   txns: Txn[];
   products: Product[];
   onSendToBuy: (items: { emoji: string; name: string; recQty: number; unit: Unit; note?: string }[]) => void;
+  finishedStock?: { productId: string; qty: number }[];
 }) {
   const { t } = useTranslation();
   const boss = addressBoss(businessName);
