@@ -602,6 +602,7 @@ const Index = () => {
               onDeleteStock={handleDeleteStock}
               onGoToBuy={() => setTab("bekalan")}
               products={products}
+              finishedStock={finishedStock}
               onSaveProduct={handleSaveProduct}
               onDeleteProduct={handleDeleteProduct}
               cards={cards}
