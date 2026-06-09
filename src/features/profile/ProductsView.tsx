@@ -141,6 +141,20 @@ export const ProductsView = ({
                             : "bg-cost/20 text-cost"
                         }`}>{margin}% margin</span>
                       )}
+                      {(() => {
+                        const fs = finishedStock.find(f => f.productId === p.id);
+                        const fsQty = fs?.qty ?? 0;
+                        const unit = p.servingUnit ?? p.batchUnit ?? "unit";
+                        return (
+                          <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${
+                            fsQty > 0 ? "bg-profit/15 text-profit" : "bg-muted text-muted-foreground"
+                          }`}>
+                            {fsQty > 0
+                              ? `✅ ${t("fs_ready").replace("{qty}", String(fsQty)).replace("{unit}", unit)}`
+                              : t("fs_not_cooked")}
+                          </span>
+                        );
+                      })()}
                     </div>
                     {unitCost > 0 && (
                       <div className="mt-1 text-sm font-semibold text-cost/90">
