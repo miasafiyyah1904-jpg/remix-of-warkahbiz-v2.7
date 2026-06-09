@@ -15,7 +15,7 @@ import { Slider } from "@/components/ui/slider";
 import { useTranslation } from "@/context/LanguageContext";
 import { estimateIngredientCost } from "@/lib/estimateCost.functions";
 import { multiplierFor, tierFor, tierLabelKey } from "./profitScale";
-import type { Product, ProductIngredient, ProductPackaging, StockItem, Unit } from "@/types";
+import type { Product, ProductIngredient, ProductPackaging, StockItem, Unit, FinishedStock } from "@/types";
 
 const UNITS: Unit[] = ["kg", "g", "gram", "liter", "ml", "biji", "pek", "paket", "kotak", "botol", "tin", "bungkus", "batang", "helai", "ikat", "tong", "papan", "kampit", "ekor", "sudu", "cawan", "unit", "pcs", "box", "pack", "dozen"];
 const BATCH_UNITS = ["biji", "pcs", "servings", "kotak", "pek", "botol", "balang", "helai", "ketul"];
@@ -47,12 +47,14 @@ function niceRound(price: number) {
 export const ProductsView = ({
   products,
   stock = [],
+  finishedStock = [],
   onSave,
   onDelete,
   onBack,
 }: {
   products: Product[];
   stock?: StockItem[];
+  finishedStock?: FinishedStock[];
   onSave: (p: Product) => void;
   onDelete: (id: string) => void;
   onBack: () => void;
@@ -139,6 +141,20 @@ export const ProductsView = ({
                             : "bg-cost/20 text-cost"
                         }`}>{margin}% margin</span>
                       )}
+                      {(() => {
+                        const fs = finishedStock.find(f => f.productId === p.id);
+                        const fsQty = fs?.qty ?? 0;
+                        const unit = p.servingUnit ?? p.batchUnit ?? "unit";
+                        return (
+                          <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${
+                            fsQty > 0 ? "bg-profit/15 text-profit" : "bg-muted text-muted-foreground"
+                          }`}>
+                            {fsQty > 0
+                              ? `✅ ${t("fs_ready").replace("{qty}", String(fsQty)).replace("{unit}", unit)}`
+                              : t("fs_not_cooked")}
+                          </span>
+                        );
+                      })()}
                     </div>
                     {unitCost > 0 && (
                       <div className="mt-1 text-sm font-semibold text-cost/90">

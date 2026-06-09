@@ -5,7 +5,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { fmtQty } from "@/lib/format";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
-import type { Product, StockItem, CookingLog, CookingPreset } from "@/types";
+import type { Product, StockItem, CookingLog, CookingPreset, FinishedStock } from "@/types";
+import { useTranslation } from "@/context/LanguageContext";
 
 const DEFAULT_PRESETS: CookingPreset[] = [
   { id: "preset-1", name: "Hari Biasa", values: {} },
@@ -18,6 +19,7 @@ export const CookingLogModal = ({
   products,
   stock,
   cookingLog,
+  finishedStock,
   onClose,
   onConfirm,
 }: {
@@ -25,9 +27,11 @@ export const CookingLogModal = ({
   products: Product[];
   stock: StockItem[];
   cookingLog: CookingLog[];
+  finishedStock: FinishedStock[];
   onClose: () => void;
   onConfirm: (entries: { productId: string; batches: number }[]) => void;
 }) => {
+  const { t } = useTranslation();
   // Build last-known batches per product from history (most recent log per product)
   const lastBatches = useMemo(() => {
     const map: Record<string, number> = {};
@@ -239,6 +243,16 @@ export const CookingLogModal = ({
                           </span>
                         )}
                       </div>
+                      {(() => {
+                        const fs = finishedStock.find(f => f.productId === p.id);
+                        const fsQty = fs?.qty ?? 0;
+                        const unit = p.servingUnit ?? p.batchUnit ?? "unit";
+                        return (
+                          <div className="mt-1 text-[10px] font-semibold text-profit">
+                            {t("cookingLog_readyToSell")}: {fsQty > 0 ? `${fsQty} ${unit}` : "—"}
+                          </div>
+                        );
+                      })()}
                     </div>
                   );
                 })}

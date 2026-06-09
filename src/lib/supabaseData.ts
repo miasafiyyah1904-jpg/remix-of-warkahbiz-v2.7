@@ -1,7 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import type {
   Txn, StockItem, BuyItem, PettyEntry, OpExEntry, Product, CookingLog, SavedCard,
-  BusinessHoursSettings, OutletSettings,
+  BusinessHoursSettings, OutletSettings, FinishedStock,
 } from "@/types";
 
 /**
@@ -188,6 +188,24 @@ const cookingMap = {
   }),
 };
 
+const finishedStockMap = {
+  to: (f: FinishedStock) => ({
+    id: f.productId,
+    product_id: f.productId,
+    product_name: f.productName,
+    product_emoji: f.productEmoji,
+    qty: f.qty,
+    last_updated_at: f.lastUpdatedAt,
+  }),
+  from: (r: any): FinishedStock => ({
+    productId: r.product_id,
+    productName: r.product_name,
+    productEmoji: r.product_emoji,
+    qty: r.qty ?? 0,
+    lastUpdatedAt: r.last_updated_at ?? new Date().toISOString(),
+  }),
+};
+
 const cardMap = {
   to: (c: SavedCard) => ({
     id: c.id, type: c.type,
@@ -289,6 +307,7 @@ export const CLOUD_STORES: Record<string, CloudStore<any>> = {
   warkahbiz_opex: listStore<OpExEntry>("opex_entries", opexMap.to, opexMap.from),
   warkahbiz_products: listStore<Product>("products", productMap.to, productMap.from),
   warkahbiz_cooking_log: listStore<CookingLog>("cooking_logs", cookingMap.to, cookingMap.from),
+  warkahbiz_finished_stock: listStore<FinishedStock>("finished_stock", finishedStockMap.to, finishedStockMap.from),
   warkahbiz_cards: listStore<SavedCard>("saved_cards", cardMap.to, cardMap.from),
   warkahbiz_chat: listStore<ChatMsg>("chat_history", chatMap.to, chatMap.from),
   warkahbiz_business_hours: businessHoursStore,

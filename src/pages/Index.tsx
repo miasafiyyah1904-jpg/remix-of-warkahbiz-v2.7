@@ -38,7 +38,7 @@ import { useSupabaseData } from "@/hooks/useSupabaseData";
 import { useAuth } from "@/context/AuthContext";
 import { useTranslation } from "@/context/LanguageContext";
 import type {
-  Tab, Txn, BuyItem, StockItem, ChatMsg, PettyEntry, ReceiptItem, Unit, OpExEntry, OpExCategory, Product, SavedCard, BusinessHoursSettings, OutletSettings, CookingLog,
+  Tab, Txn, BuyItem, StockItem, ChatMsg, PettyEntry, ReceiptItem, Unit, OpExEntry, OpExCategory, Product, SavedCard, BusinessHoursSettings, OutletSettings, CookingLog, FinishedStock,
 } from "@/types";
 import { DEFAULT_OUTLET } from "@/types";
 import { DEFAULT_BUSINESS_HOURS } from "@/features/profile/BusinessHoursView";
@@ -77,6 +77,7 @@ const Index = () => {
   const [opex, setOpex] = useSupabaseData<OpExEntry[]>("warkahbiz_opex", []);
   const [products, setProducts] = useSupabaseData<Product[]>("warkahbiz_products", []);
   const [cookingLog, setCookingLog] = useSupabaseData<CookingLog[]>("warkahbiz_cooking_log", []);
+  const [finishedStock, setFinishedStock] = useSupabaseData<FinishedStock[]>("warkahbiz_finished_stock", []);
   const [cards, setCards] = useSupabaseData<SavedCard[]>("warkahbiz_cards", []);
   const [businessHours, setBusinessHours] = useSupabaseData<BusinessHoursSettings>("warkahbiz_business_hours", DEFAULT_BUSINESS_HOURS);
   const [outlet, setOutlet] = useSupabaseData<OutletSettings>("warkahbiz_outlet", DEFAULT_OUTLET);
@@ -175,6 +176,20 @@ const Index = () => {
 
   const handleSaveTxn = (t: Omit<Txn, "id" | "ts" | "time">) => {
     setTxns((prev) => [...prev, { ...t, id: Date.now(), ts: Date.now(), time: nowTime(), createdAt: new Date().toISOString() }]);
+    if (t.type === "in" && t.soldItems && t.soldItems.length > 0) {
+      const nowIso = new Date().toISOString();
+      setFinishedStock(prev =>
+        prev.map(f => {
+          const sold = t.soldItems!.find(s => s.productId === f.productId);
+          if (!sold) return f;
+          return {
+            ...f,
+            qty: Math.max(0, f.qty - sold.qty),
+            lastUpdatedAt: nowIso,
+          };
+        })
+      );
+    }
   };
 
   // Track the highest qty ever recorded for each stock item (used to auto-derive minQty)
@@ -240,6 +255,30 @@ const Index = () => {
         batchUnit: product.cookingUnit ?? product.batchUnit ?? "batch",
       })),
     ]);
+
+    entries.forEach(({ productId, batches }) => {
+      const product = products.find(p => p.id === productId);
+      if (!product || batches <= 0) return;
+      const servings = product.servingsPerBatch ?? product.batchSize ?? 1;
+      const produced = batches * servings;
+      setFinishedStock(prev => {
+        const existing = prev.find(f => f.productId === productId);
+        if (existing) {
+          return prev.map(f =>
+            f.productId === productId
+              ? { ...f, qty: f.qty + produced, lastUpdatedAt: nowIso }
+              : f
+          );
+        }
+        return [...prev, {
+          productId,
+          productName: product.name,
+          productEmoji: product.emoji,
+          qty: produced,
+          lastUpdatedAt: nowIso,
+        }];
+      });
+    });
   };
 
   const handleBought = (id: string) => setBuy((prev) => prev.map((b) => b.id === id ? { ...b, done: !b.done } : b));
@@ -563,6 +602,7 @@ const Index = () => {
               onDeleteStock={handleDeleteStock}
               onGoToBuy={() => setTab("bekalan")}
               products={products}
+              finishedStock={finishedStock}
               onSaveProduct={handleSaveProduct}
               onDeleteProduct={handleDeleteProduct}
               cards={cards}
@@ -600,7 +640,7 @@ const Index = () => {
         {settingsOpen && <SettingsPanel open={settingsOpen} onClose={() => setSettingsOpen(false)} profileName={profileName || "Boss"} businessName={businessName || "WarkahBiz"} onSaveProfile={saveProfile} onLogout={signOut} />}
         {calcOpen && <PricingCalculator onClose={() => setCalcOpen(false)} businessName={businessName || profileName} onSave={() => setCalcOpen(false)} />}
         {goalsOpen && <GoalsPlanner onClose={() => setGoalsOpen(false)} businessName={businessName || profileName} />}
-        {forecastOpen && <SalesForecast onClose={() => setForecastOpen(false)} businessName={businessName || profileName} txns={txns} products={products} onSendToBuy={(items) => items.forEach(handleAddBuy)} finishedStock={[]} />}
+        {forecastOpen && <SalesForecast onClose={() => setForecastOpen(false)} businessName={businessName || profileName} txns={txns} products={products} onSendToBuy={(items) => items.forEach(handleAddBuy)} finishedStock={finishedStock} />}
         {wasteOpen && <WasteTracker onClose={() => setWasteOpen(false)} businessName={businessName || profileName} products={products} stock={stock} onSendToBuy={(items) => items.forEach(handleAddBuy)} />}
         {autopsyOpen && (
           <LaporanMalam
@@ -635,6 +675,7 @@ const Index = () => {
             products={products}
             stock={stock}
             cookingLog={cookingLog}
+            finishedStock={finishedStock}
             onClose={() => setCookingLogOpen(false)}
             onConfirm={handleLogCooking}
           />
