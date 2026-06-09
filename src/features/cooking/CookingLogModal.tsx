@@ -5,7 +5,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { fmtQty } from "@/lib/format";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
-import type { Product, StockItem, CookingLog, CookingPreset } from "@/types";
+import type { Product, StockItem, CookingLog, CookingPreset, FinishedStock } from "@/types";
+import { useTranslation } from "@/context/LanguageContext";
 
 const DEFAULT_PRESETS: CookingPreset[] = [
   { id: "preset-1", name: "Hari Biasa", values: {} },
