@@ -1193,5 +1193,8 @@ export default {
   sf_readyToSell: "Ready to sell",
   sf_readyQty: "{qty} units on hand",
   home_recentTxns: "Today's Activity",
+  cookingLog_readyToSell: "Ready to sell",
+  fs_ready: "{qty} {unit} ready",
+  fs_not_cooked: "Not cooked yet",
 };
 
