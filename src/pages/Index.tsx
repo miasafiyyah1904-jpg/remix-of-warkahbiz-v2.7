@@ -77,6 +77,7 @@ const Index = () => {
   const [opex, setOpex] = useSupabaseData<OpExEntry[]>("warkahbiz_opex", []);
   const [products, setProducts] = useSupabaseData<Product[]>("warkahbiz_products", []);
   const [cookingLog, setCookingLog] = useSupabaseData<CookingLog[]>("warkahbiz_cooking_log", []);
+  const [finishedStock, setFinishedStock] = useSupabaseData<FinishedStock[]>("warkahbiz_finished_stock", []);
   const [cards, setCards] = useSupabaseData<SavedCard[]>("warkahbiz_cards", []);
   const [businessHours, setBusinessHours] = useSupabaseData<BusinessHoursSettings>("warkahbiz_business_hours", DEFAULT_BUSINESS_HOURS);
   const [outlet, setOutlet] = useSupabaseData<OutletSettings>("warkahbiz_outlet", DEFAULT_OUTLET);
