@@ -65,6 +65,14 @@ export interface CookingLog {
   batchUnit: string;
 }
 
+export interface FinishedStock {
+  productId: string;
+  productName: string;
+  productEmoji: string;
+  qty: number;
+  lastUpdatedAt: string;
+}
+
 export interface SafeStockItem {
   id: string;
   emoji: string;
