@@ -328,6 +328,11 @@ const Index = () => {
     }
   };
 
+  const handleDeleteOpex = (id: number) => {
+    setOpex(prev => prev.filter(e => e.id !== id));
+    toast.success(t("opex_deleted"));
+  };
+
   const handleSendChat = async (text: string, snapshot: BusinessSnapshot) => {
     const userMsg: ChatMsg = { id: Date.now(), from: "user", text };
     setChat((prev) => [...prev, userMsg].slice(-50));
