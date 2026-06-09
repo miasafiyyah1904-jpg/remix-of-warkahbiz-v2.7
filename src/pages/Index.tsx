@@ -519,7 +519,7 @@ const Index = () => {
               <TodayView
                 today={today}
                 profileName={profileName} businessName={businessName}
-                duitKeluar={todayCogs + todayOtherOpex}
+                duitKeluar={todayCogs + todayOtherOpex + today.out}
                 cookingLog={cookingLog}
                 onOpenCookingLog={() => setCookingLogOpen(true)}
                 onOpenCalc={() => setCalcOpen(true)}
@@ -528,6 +528,8 @@ const Index = () => {
                 onOpenWaste={() => setWasteOpen(true)}
                 onOpenAutopsy={() => setAutopsyOpen(true)}
                 onOpenProjection={() => setProjectionOpen(true)}
+                txns={txns}
+                onEditTxn={(t) => { setEditingTxn(t); setModalOpen(true); }}
               />
             </>
           )}
