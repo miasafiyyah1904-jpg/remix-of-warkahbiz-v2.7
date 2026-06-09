@@ -243,6 +243,16 @@ export const CookingLogModal = ({
                           </span>
                         )}
                       </div>
+                      {(() => {
+                        const fs = finishedStock.find(f => f.productId === p.id);
+                        const fsQty = fs?.qty ?? 0;
+                        const unit = p.servingUnit ?? p.batchUnit ?? "unit";
+                        return (
+                          <div className="mt-1 text-[10px] font-semibold text-profit">
+                            {t("cookingLog_readyToSell")}: {fsQty > 0 ? `${fsQty} ${unit}` : "—"}
+                          </div>
+                        );
+                      })()}
                     </div>
                   );
                 })}
