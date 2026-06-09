@@ -666,6 +666,7 @@ const TodayView = ({
   today, profileName, businessName, duitKeluar,
   cookingLog, onOpenCookingLog,
   onOpenCalc, onOpenGoals, onOpenForecast, onOpenWaste, onOpenAutopsy, onOpenProjection,
+  txns, onEditTxn,
 }: {
   today: { in: number; out: number; profit: number };
   profileName: string; businessName: string;
@@ -673,8 +674,12 @@ const TodayView = ({
   cookingLog: CookingLog[]; onOpenCookingLog: () => void;
   onOpenCalc: () => void; onOpenGoals: () => void; onOpenForecast: () => void;
   onOpenWaste: () => void; onOpenAutopsy: () => void; onOpenProjection: () => void;
+  txns: Txn[];
+  onEditTxn: (t: Txn) => void;
 }) => {
   void onOpenCalc;
+  const isPeribadi = (label: string, emoji: string) =>
+    emoji === "🧑" || /peribadi/i.test(label);
   const { t, language } = useTranslation();
   const [insight, setInsight] = useState<string | null>(null);
   const dateLocale = language === "en" ? "en-MY" : "ms-MY";
