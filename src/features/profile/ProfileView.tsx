@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Camera, X, ChevronDown, HelpCircle, Clock, Wallet, Calculator, Store, UtensilsCrossed, Truck } from "lucide-react";
-import type { StockItem, Product, SavedCard, BusinessHoursSettings, Supplier, OutletSettings } from "@/types";
+import type { StockItem, Product, SavedCard, BusinessHoursSettings, Supplier, OutletSettings, FinishedStock } from "@/types";
 import { ProductsView } from "@/features/profile/ProductsView";
 import { WalletView } from "@/features/profile/WalletView";
 import { BusinessHoursView } from "@/features/profile/BusinessHoursView";
