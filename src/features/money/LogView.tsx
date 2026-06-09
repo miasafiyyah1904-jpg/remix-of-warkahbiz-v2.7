@@ -566,6 +566,13 @@ export const LogView = ({ txns, today, week, month, opex, todayCogs, todayOtherO
 
                     </div>
                     <div className="font-extrabold text-sm text-cost">−RM {e.amount.toFixed(2)}</div>
+                    <button
+                      onClick={() => onDeleteOpex(e.id)}
+                      className="p-2 rounded-xl text-muted-foreground hover:text-cost hover:bg-cost/10 tap transition-colors"
+                      aria-label={t("lv_deleteOpex")}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
                   </div>
                 ))}
               </div>
