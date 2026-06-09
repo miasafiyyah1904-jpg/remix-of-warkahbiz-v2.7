@@ -36,6 +36,7 @@ export const ProfileView = ({
   onDeleteStock,
   onGoToBuy,
   products,
+  finishedStock,
   onSaveProduct,
   onDeleteProduct,
   cards,
@@ -56,6 +57,7 @@ export const ProfileView = ({
   onDeleteStock: (id: string) => void;
   onGoToBuy: () => void;
   products: Product[];
+  finishedStock: FinishedStock[];
   onSaveProduct: (p: Product) => void;
   onDeleteProduct: (id: string) => void;
   cards: SavedCard[];
