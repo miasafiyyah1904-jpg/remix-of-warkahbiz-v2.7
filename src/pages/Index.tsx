@@ -328,6 +328,11 @@ const Index = () => {
     }
   };
 
+  const handleDeleteOpex = (id: number) => {
+    setOpex(prev => prev.filter(e => e.id !== id));
+    toast.success(t("opex_deleted"));
+  };
+
   const handleSendChat = async (text: string, snapshot: BusinessSnapshot) => {
     const userMsg: ChatMsg = { id: Date.now(), from: "user", text };
     setChat((prev) => [...prev, userMsg].slice(-50));
@@ -514,7 +519,7 @@ const Index = () => {
               <TodayView
                 today={today}
                 profileName={profileName} businessName={businessName}
-                duitKeluar={todayCogs + todayOtherOpex}
+                duitKeluar={todayCogs + todayOtherOpex + today.out}
                 cookingLog={cookingLog}
                 onOpenCookingLog={() => setCookingLogOpen(true)}
                 onOpenCalc={() => setCalcOpen(true)}
@@ -523,6 +528,8 @@ const Index = () => {
                 onOpenWaste={() => setWasteOpen(true)}
                 onOpenAutopsy={() => setAutopsyOpen(true)}
                 onOpenProjection={() => setProjectionOpen(true)}
+                txns={txns}
+                onEditTxn={(t) => { setEditingTxn(t); setModalOpen(true); }}
               />
             </>
           )}
@@ -540,7 +547,7 @@ const Index = () => {
             </div>
           )}
           {tab === "log" && (
-            <LogView txns={txns} today={today} week={week} month={month} opex={opex} todayCogs={todayCogs} todayOtherOpex={todayOtherOpex} todayNetProfit={todayNetProfit} onExport={() => setExportOpen(true)} onExportReport={() => setReportOpen(true)} onOpenIncomeStatement={() => setIncomeStatementOpen(true)} onAddOpEx={handleAddOpEx} onEditTxn={(t) => { setEditingTxn(t); setModalOpen(true); }} />
+            <LogView txns={txns} today={today} week={week} month={month} opex={opex} todayCogs={todayCogs} todayOtherOpex={todayOtherOpex} todayNetProfit={todayNetProfit} onExport={() => setExportOpen(true)} onExportReport={() => setReportOpen(true)} onOpenIncomeStatement={() => setIncomeStatementOpen(true)} onAddOpEx={handleAddOpEx} onDeleteOpex={handleDeleteOpex} onEditTxn={(t) => { setEditingTxn(t); setModalOpen(true); }} />
           )}
           {tab === "ai" && (
             <ChatView messages={displayChat} onSend={handleSendChat} onClear={() => setChat([])} isLoading={chatLoading} txns={txns} stock={stock} opex={opex} petty={petty} businessName={businessName || profileName || "WarkahBiz"} products={products} />
@@ -593,7 +600,7 @@ const Index = () => {
         {settingsOpen && <SettingsPanel open={settingsOpen} onClose={() => setSettingsOpen(false)} profileName={profileName || "Boss"} businessName={businessName || "WarkahBiz"} onSaveProfile={saveProfile} onLogout={signOut} />}
         {calcOpen && <PricingCalculator onClose={() => setCalcOpen(false)} businessName={businessName || profileName} onSave={() => setCalcOpen(false)} />}
         {goalsOpen && <GoalsPlanner onClose={() => setGoalsOpen(false)} businessName={businessName || profileName} />}
-        {forecastOpen && <SalesForecast onClose={() => setForecastOpen(false)} businessName={businessName || profileName} txns={txns} products={products} onSendToBuy={(items) => items.forEach(handleAddBuy)} />}
+        {forecastOpen && <SalesForecast onClose={() => setForecastOpen(false)} businessName={businessName || profileName} txns={txns} products={products} onSendToBuy={(items) => items.forEach(handleAddBuy)} finishedStock={[]} />}
         {wasteOpen && <WasteTracker onClose={() => setWasteOpen(false)} businessName={businessName || profileName} products={products} stock={stock} onSendToBuy={(items) => items.forEach(handleAddBuy)} />}
         {autopsyOpen && (
           <LaporanMalam
@@ -659,6 +666,7 @@ const TodayView = ({
   today, profileName, businessName, duitKeluar,
   cookingLog, onOpenCookingLog,
   onOpenCalc, onOpenGoals, onOpenForecast, onOpenWaste, onOpenAutopsy, onOpenProjection,
+  txns, onEditTxn,
 }: {
   today: { in: number; out: number; profit: number };
   profileName: string; businessName: string;
@@ -666,8 +674,12 @@ const TodayView = ({
   cookingLog: CookingLog[]; onOpenCookingLog: () => void;
   onOpenCalc: () => void; onOpenGoals: () => void; onOpenForecast: () => void;
   onOpenWaste: () => void; onOpenAutopsy: () => void; onOpenProjection: () => void;
+  txns: Txn[];
+  onEditTxn: (t: Txn) => void;
 }) => {
   void onOpenCalc;
+  const isPeribadi = (label: string, emoji: string) =>
+    emoji === "🧑" || /peribadi/i.test(label);
   const { t, language } = useTranslation();
   const [insight, setInsight] = useState<string | null>(null);
   const dateLocale = language === "en" ? "en-MY" : "ms-MY";
@@ -679,6 +691,14 @@ const TodayView = ({
     if (h < 19) return t("greetingAfternoon");
     return t("greetingNight");
   };
+  const todayKey = new Date().toISOString().slice(0, 10);
+  const recentTxns = txns
+    .filter(x =>
+      (x.createdAt?.slice(0, 10) ?? new Date(x.ts).toISOString().slice(0, 10)) === todayKey &&
+      !isPeribadi(x.label, x.emoji)
+    )
+    .slice(-5)
+    .reverse();
   return (
     <div className="px-5 pt-6 space-y-5">
       <header className="animate-fade-in space-y-1">
@@ -700,7 +720,38 @@ const TodayView = ({
         </div>
       </div>
 
+      {recentTxns.length > 0 && (
+        <section className="space-y-3 animate-fade-in">
+          <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-wider px-1">
+            {t("home_recentTxns")}
+          </h2>
+          <div className="space-y-2">
+            {recentTxns.map(txn => (
+              <button
+                key={txn.id}
+                onClick={() => onEditTxn(txn)}
+                className="w-full rounded-2xl p-3 bg-surface border border-border flex items-center gap-3 tap text-left"
+              >
+                <div className="w-10 h-10 rounded-xl grid place-items-center text-xl bg-muted/40">
+                  {txn.emoji || (txn.type === "in" ? "💰" : "🛒")}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="font-semibold text-sm truncate">{txn.label}</div>
+                  <div className="text-[11px] text-muted-foreground">
+                    {new Date(txn.ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                  </div>
+                </div>
+                <div className={`font-extrabold text-sm ${txn.type === "in" ? "text-profit" : "text-cost"}`}>
+                  {txn.type === "in" ? "+" : "−"}RM {txn.amount.toFixed(2)}
+                </div>
+              </button>
+            ))}
+          </div>
+        </section>
+      )}
+
       <CookingLogPrompt logs={cookingLog} onOpen={onOpenCookingLog} />
+
 
       <section className="space-y-3 animate-fade-in">
         <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-wider px-1">{t("toolsAiHeader")}</h2>

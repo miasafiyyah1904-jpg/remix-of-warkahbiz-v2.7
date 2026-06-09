@@ -1188,5 +1188,10 @@ export default {
   pos_save_button: "Save Sale  ·  RM {total}",
   pos_back_to_pick: "← Choose method",
   pos_decrement_toast: "Removed 1 {name}",
+  opex_deleted: "Cost entry deleted",
+  lv_deleteOpex: "Delete entry",
+  sf_readyToSell: "Ready to sell",
+  sf_readyQty: "{qty} units on hand",
+  home_recentTxns: "Today's Activity",
 };
 

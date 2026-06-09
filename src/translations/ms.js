@@ -1187,5 +1187,10 @@ export default {
   pos_save_button: "Simpan Jualan  ·  RM {total}",
   pos_back_to_pick: "← Tukar cara",
   pos_decrement_toast: "Kurangkan 1 {name}",
+  opex_deleted: "Rekod kos dipadam",
+  lv_deleteOpex: "Padam rekod",
+  sf_readyToSell: "Sedia jual",
+  sf_readyQty: "{qty} unit sedia",
+  home_recentTxns: "Aktiviti Hari Ini",
 };
 

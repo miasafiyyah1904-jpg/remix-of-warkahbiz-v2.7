@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Share2, ChevronDown, ChevronRight, FileText } from "lucide-react";
+import { Share2, ChevronDown, ChevronRight, FileText, Trash2 } from "lucide-react";
 import type { Txn, OpExEntry, OpExCategory } from "@/types";
 import { OPEX_CATEGORIES, OPEX_EMOJI } from "@/types";
 import { fmt } from "@/lib/format";
@@ -52,7 +52,7 @@ const MiniStat = ({ label, value, tone }: { label: string; value: number; tone: 
 
 type Filter = "all" | "in" | "out" | "opex" | "untung";
 
-export const LogView = ({ txns, today, week, month, opex, todayCogs, todayOtherOpex, todayNetProfit, onExport, onExportReport, onOpenIncomeStatement, onAddOpEx, onEditTxn }: {
+export const LogView = ({ txns, today, week, month, opex, todayCogs, todayOtherOpex, todayNetProfit, onExport, onExportReport, onOpenIncomeStatement, onAddOpEx, onDeleteOpex, onEditTxn }: {
   txns: Txn[];
   today: { in: number; out: number; profit: number };
   week: { in: number; out: number; profit: number };
@@ -65,6 +65,7 @@ export const LogView = ({ txns, today, week, month, opex, todayCogs, todayOtherO
   onExportReport: () => void;
   onOpenIncomeStatement?: () => void;
   onAddOpEx: (category: OpExCategory, amount: number, desc: string, paidFromPetty: boolean) => void;
+  onDeleteOpex: (id: number) => void;
   onEditTxn?: (t: Txn) => void;
 }) => {
 
@@ -565,6 +566,13 @@ export const LogView = ({ txns, today, week, month, opex, todayCogs, todayOtherO
 
                     </div>
                     <div className="font-extrabold text-sm text-cost">−RM {e.amount.toFixed(2)}</div>
+                    <button
+                      onClick={() => onDeleteOpex(e.id)}
+                      className="p-2 rounded-xl text-muted-foreground hover:text-cost hover:bg-cost/10 tap transition-colors"
+                      aria-label={t("lv_deleteOpex")}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
                   </div>
                 ))}
               </div>
