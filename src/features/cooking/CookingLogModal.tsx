@@ -19,6 +19,7 @@ export const CookingLogModal = ({
   products,
   stock,
   cookingLog,
+  finishedStock,
   onClose,
   onConfirm,
 }: {
@@ -26,9 +27,11 @@ export const CookingLogModal = ({
   products: Product[];
   stock: StockItem[];
   cookingLog: CookingLog[];
+  finishedStock: FinishedStock[];
   onClose: () => void;
   onConfirm: (entries: { productId: string; batches: number }[]) => void;
 }) => {
+  const { t } = useTranslation();
   // Build last-known batches per product from history (most recent log per product)
   const lastBatches = useMemo(() => {
     const map: Record<string, number> = {};
