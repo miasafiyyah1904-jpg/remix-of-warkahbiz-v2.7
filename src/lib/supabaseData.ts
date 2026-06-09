@@ -188,6 +188,24 @@ const cookingMap = {
   }),
 };
 
+const finishedStockMap = {
+  to: (f: FinishedStock) => ({
+    id: f.productId,
+    product_id: f.productId,
+    product_name: f.productName,
+    product_emoji: f.productEmoji,
+    qty: f.qty,
+    last_updated_at: f.lastUpdatedAt,
+  }),
+  from: (r: any): FinishedStock => ({
+    productId: r.product_id,
+    productName: r.product_name,
+    productEmoji: r.product_emoji,
+    qty: r.qty ?? 0,
+    lastUpdatedAt: r.last_updated_at ?? new Date().toISOString(),
+  }),
+};
+
 const cardMap = {
   to: (c: SavedCard) => ({
     id: c.id, type: c.type,
