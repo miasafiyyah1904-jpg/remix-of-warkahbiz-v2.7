@@ -691,6 +691,14 @@ const TodayView = ({
     if (h < 19) return t("greetingAfternoon");
     return t("greetingNight");
   };
+  const todayKey = new Date().toISOString().slice(0, 10);
+  const recentTxns = txns
+    .filter(x =>
+      (x.createdAt?.slice(0, 10) ?? new Date(x.ts).toISOString().slice(0, 10)) === todayKey &&
+      !isPeribadi(x.label, x.emoji)
+    )
+    .slice(-5)
+    .reverse();
   return (
     <div className="px-5 pt-6 space-y-5">
       <header className="animate-fade-in space-y-1">
