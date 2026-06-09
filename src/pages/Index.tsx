@@ -598,7 +598,7 @@ const Index = () => {
         {settingsOpen && <SettingsPanel open={settingsOpen} onClose={() => setSettingsOpen(false)} profileName={profileName || "Boss"} businessName={businessName || "WarkahBiz"} onSaveProfile={saveProfile} onLogout={signOut} />}
         {calcOpen && <PricingCalculator onClose={() => setCalcOpen(false)} businessName={businessName || profileName} onSave={() => setCalcOpen(false)} />}
         {goalsOpen && <GoalsPlanner onClose={() => setGoalsOpen(false)} businessName={businessName || profileName} />}
-        {forecastOpen && <SalesForecast onClose={() => setForecastOpen(false)} businessName={businessName || profileName} txns={txns} products={products} onSendToBuy={(items) => items.forEach(handleAddBuy)} />}
+        {forecastOpen && <SalesForecast onClose={() => setForecastOpen(false)} businessName={businessName || profileName} txns={txns} products={products} onSendToBuy={(items) => items.forEach(handleAddBuy)} finishedStock={[]} />}
         {wasteOpen && <WasteTracker onClose={() => setWasteOpen(false)} businessName={businessName || profileName} products={products} stock={stock} onSendToBuy={(items) => items.forEach(handleAddBuy)} />}
         {autopsyOpen && (
           <LaporanMalam
