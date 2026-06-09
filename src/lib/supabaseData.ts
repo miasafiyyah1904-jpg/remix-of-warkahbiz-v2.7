@@ -307,6 +307,7 @@ export const CLOUD_STORES: Record<string, CloudStore<any>> = {
   warkahbiz_opex: listStore<OpExEntry>("opex_entries", opexMap.to, opexMap.from),
   warkahbiz_products: listStore<Product>("products", productMap.to, productMap.from),
   warkahbiz_cooking_log: listStore<CookingLog>("cooking_logs", cookingMap.to, cookingMap.from),
+  warkahbiz_finished_stock: listStore<FinishedStock>("finished_stock", finishedStockMap.to, finishedStockMap.from),
   warkahbiz_cards: listStore<SavedCard>("saved_cards", cardMap.to, cardMap.from),
   warkahbiz_chat: listStore<ChatMsg>("chat_history", chatMap.to, chatMap.from),
   warkahbiz_business_hours: businessHoursStore,
