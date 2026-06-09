@@ -1,7 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import type {
   Txn, StockItem, BuyItem, PettyEntry, OpExEntry, Product, CookingLog, SavedCard,
-  BusinessHoursSettings, OutletSettings,
+  BusinessHoursSettings, OutletSettings, FinishedStock,
 } from "@/types";
 
 /**
