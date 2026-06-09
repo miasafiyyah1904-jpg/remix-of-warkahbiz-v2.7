@@ -720,7 +720,38 @@ const TodayView = ({
         </div>
       </div>
 
+      {recentTxns.length > 0 && (
+        <section className="space-y-3 animate-fade-in">
+          <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-wider px-1">
+            {t("home_recentTxns")}
+          </h2>
+          <div className="space-y-2">
+            {recentTxns.map(txn => (
+              <button
+                key={txn.id}
+                onClick={() => onEditTxn(txn)}
+                className="w-full rounded-2xl p-3 bg-surface border border-border flex items-center gap-3 tap text-left"
+              >
+                <div className="w-10 h-10 rounded-xl grid place-items-center text-xl bg-muted/40">
+                  {txn.emoji || (txn.type === "in" ? "💰" : "🛒")}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="font-semibold text-sm truncate">{txn.label}</div>
+                  <div className="text-[11px] text-muted-foreground">
+                    {new Date(txn.ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                  </div>
+                </div>
+                <div className={`font-extrabold text-sm ${txn.type === "in" ? "text-profit" : "text-cost"}`}>
+                  {txn.type === "in" ? "+" : "−"}RM {txn.amount.toFixed(2)}
+                </div>
+              </button>
+            ))}
+          </div>
+        </section>
+      )}
+
       <CookingLogPrompt logs={cookingLog} onOpen={onOpenCookingLog} />
+
 
       <section className="space-y-3 animate-fade-in">
         <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-wider px-1">{t("toolsAiHeader")}</h2>
