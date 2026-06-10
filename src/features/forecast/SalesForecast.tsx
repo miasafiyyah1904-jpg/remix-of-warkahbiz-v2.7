@@ -215,8 +215,8 @@ export function SalesForecast({
       .update({
         actual_revenue: Math.round(estimatedActual),
         accuracy_pct:   accuracyPct,
-      })
-      .eq("device_id", device_id)
+      } as never)
+      .eq("device_id" as never, device_id as never)
       .eq("forecast_date", isoDate)
       .then(() => {});
   };
