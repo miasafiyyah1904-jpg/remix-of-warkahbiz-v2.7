@@ -417,7 +417,7 @@ export function SalesForecast({
                   return (
                     <button
                       key={d.isoDate}
-                      onClick={() => setSelectedIso(d.isoDate)}
+                      onClick={() => { setSelectedIso(d.isoDate); setPrepOpen(false); }}
                       className={`shrink-0 w-[120px] rounded-2xl p-3 border-2 text-left tap transition-all duration-150 ${active ? "border-transparent bg-gradient-profit text-profit-foreground shadow-card scale-[1.02]" : meta.cardClass}`}
                     >
                       <div className="flex items-center justify-between">
