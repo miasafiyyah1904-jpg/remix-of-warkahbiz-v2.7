@@ -51,9 +51,11 @@ interface Props {
   txns: Txn[];
   opex: OpExEntry[];
   stock: StockItem[];
+  finishedStock: FinishedStock[];
+  products: Product[];
 }
 
-export function LaporanMalam({ onClose, businessName, txns, opex, stock }: Props) {
+export function LaporanMalam({ onClose, businessName, txns, opex, stock, finishedStock, products }: Props) {
   const { t } = useTranslation();
   const boss = addressBoss(businessName);
   const [view, setView] = useState<"report" | "history">("report");
