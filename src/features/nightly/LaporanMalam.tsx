@@ -31,7 +31,7 @@ import {
   type NightlyReportRow,
   type ActionItemRow,
 } from "./nightlyReportApi";
-import type { Txn, OpExEntry, StockItem } from "@/types";
+import type { Txn, OpExEntry, StockItem, FinishedStock, Product } from "@/types";
 import { useTranslation } from "@/context/LanguageContext";
 
 const addressBoss = (b: string) => (b?.trim() ? b.trim() : "Boss");
