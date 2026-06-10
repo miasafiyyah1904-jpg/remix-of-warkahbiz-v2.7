@@ -355,6 +355,9 @@ interface ReportContentProps {
   onToggleAction: (id: string, done: boolean) => Promise<void>;
   onClose: () => void;
   onOpenHistory: () => void;
+  txns: Txn[];
+  finishedStock: FinishedStock[];
+  products: Product[];
 }
 
 function ReportContent(p: ReportContentProps) {
