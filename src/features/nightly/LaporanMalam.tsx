@@ -471,6 +471,30 @@ function ReportContent(p: ReportContentProps) {
         y += 4;
       }
 
+      if (finishedGoodsStats.length > 0) {
+        y += 8;
+        doc.setFontSize(11);
+        doc.setFont("helvetica", "bold");
+        doc.text(t("lm_fg_title"), 14, y);
+        y += 6;
+        doc.setFontSize(9);
+        doc.setFont("helvetica", "normal");
+        finishedGoodsStats.forEach(s => {
+          if (y > 280) { doc.addPage(); y = 18; }
+          doc.text(
+            `${s.productEmoji} ${s.productName}: ${t("lm_fg_cooked")} ${s.cooked} | ${t("lm_fg_sold")} ${s.soldToday} | ${t("lm_fg_unsold")} ${s.unsold}${s.sellThrough !== null ? ` | ${s.sellThrough}%` : ""}`,
+            14,
+            y
+          );
+          y += 5;
+        });
+        if (totalWasteValue > 0) {
+          doc.text(`${t("lm_fg_wasteTotal")}: RM ${totalWasteValue.toFixed(2)}`, 14, y);
+          y += 5;
+        }
+      }
+
+
       if (p.actions.length) {
         doc.setFontSize(13);
         doc.text(t("lm_tomorrowActions"), 14, y);
