@@ -488,34 +488,132 @@ export function SalesForecast({
                   <p className="text-base font-extrabold mt-1">
                     {LEVEL_META[detail.level].emoji} {t(LEVEL_META[detail.level].labelKey)} — {t("sf_expected")} <span className="text-primary">{fmt(detail.expected)}</span>
                   </p>
-                  <div className="mt-2 rounded-xl bg-accent/10 border border-accent/30 p-3">
-                    <p className="text-xs font-bold uppercase tracking-wider text-accent-foreground/80 flex items-center gap-1">
-                      <Activity className="w-3 h-3" /> {t("sf_aiModelTitle")}
-                    </p>
-                    <p className="text-sm mt-1 leading-relaxed">
-                      {boss}, {t("sf_aiProb1")} <span className="font-extrabold">{detail.probHit}% {t("sf_aiProb2")}</span> {t("sf_aiProb3")}{" "}
-                      <span className="font-extrabold text-primary">{fmt(detail.expected)}</span>
-                      {" "}— {t("sf_aiPrepRange")} <span className="font-semibold">{fmt(detail.low)}–{fmt(detail.high)}</span>.
-                    </p>
-                    {detail.weather && detail.weather.severity !== "ok" && (
-                      <p className="text-xs text-muted-foreground mt-1.5 flex items-center gap-1">
-                        <CloudRain className="w-3 h-3" /> {detail.weather.label} {detail.weather.emoji}
-                        {" "}({detail.weather.trafficAdjust >= 0 ? "+" : ""}{Math.round(detail.weather.trafficAdjust * 100)}% {t("sf_traffic")})
+                </div>
+
+                {/* PREP HERO */}
+                {detail.stock.length > 0 ? (
+                  <div className="rounded-2xl bg-primary/5 border border-primary/20 p-4 space-y-3">
+                    <div>
+                      <p className="text-sm font-extrabold flex items-center gap-1.5">
+                        🧑‍🍳 {t("sf_prepTitle")} — {detail.dayName}
+                      </p>
+                      <p className="text-[11px] text-muted-foreground mt-0.5">
+                        {t("sf_prepBased")} {fmt(detail.expected)}
+                      </p>
+                    </div>
+
+                    <div className="space-y-1.5">
+                      {detail.stock.map((s, i) => (
+                        <div key={s.name} className="rounded-xl bg-background/60 border border-border px-3 py-2 space-y-1">
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="flex items-center gap-2"><span>{s.emoji}</span><span className="font-semibold">{s.name}</span></span>
+                            <span className="font-bold text-primary">{s.need} {s.unit}</span>
+                          </div>
+                          {(() => {
+                            const fs = (finishedStock ?? []).find(
+                              f => products.find(p => p.id === f.productId)?.name?.toLowerCase() === s.name.toLowerCase()
+                            );
+                            const fsQty = fs?.qty ?? 0;
+                            return fsQty > 0 ? (
+                              <p className="text-[11px] text-profit font-semibold">
+                                ✅ {t("sf_readyToSell")}: {t("sf_readyQty").replace("{qty}", String(fsQty))}
+                              </p>
+                            ) : null;
+                          })()}
+                        </div>
+                      ))}
+                    </div>
+
+                    {stats.distinctDays < 14 && (
+                      <p className="text-[11px] text-muted-foreground italic">
+                        * {t("sf_prepLowDataWarning")}
                       </p>
                     )}
-                    {detail.culturalSignal.label && (
-                      <p className="text-xs text-muted-foreground mt-1.5">
-                        🗓️ {detail.culturalSignal.label}
-                        {" "}({detail.culturalSignal.multiplier >= 1 ? "+" : ""}{Math.round((detail.culturalSignal.multiplier - 1) * 100)}% jangkaan)
-                      </p>
-                    )}
-                    {detail.paydaySignal.label && (
-                      <p className="text-xs text-muted-foreground mt-1.5">
-                        💰 {detail.paydaySignal.label}
-                        {" "}(+{Math.round((detail.paydaySignal.multiplier - 1) * 100)}% jangkaan)
-                      </p>
+
+                    <Button onClick={handleSendDayToBuy} className="w-full h-12 rounded-2xl bg-primary text-primary-foreground font-bold">
+                      <ShoppingCart className="w-4 h-4 mr-2" /> {t("sf_addToBuy")}
+                    </Button>
+                  </div>
+                ) : products.length === 0 ? (
+                  <div className="rounded-2xl bg-muted/40 border border-border p-6 text-center space-y-2">
+                    <p className="text-4xl">📦</p>
+                    <p className="text-sm font-extrabold">{t("sf_noProductsTitle")}</p>
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      {t("sf_noProductsDesc")}
+                    </p>
+                  </div>
+                ) : (
+                  <p className="text-xs text-muted-foreground italic">{t("sf_noStock")}</p>
+                )}
+
+                {/* Feedback card for past days */}
+                {isPastDay && (
+                  <div className="rounded-2xl bg-card border border-border p-4 space-y-3">
+                    {feedbackGiven[detail?.isoDate ?? ""] ? (
+                      <div className="flex items-center gap-2 text-sm text-profit">
+                        <CheckCircle2 className="w-5 h-5" />
+                        <span className="font-semibold">
+                          {t("sf_feedbackThanks")}
+                        </span>
+                      </div>
+                    ) : (
+                      <>
+                        <p className="text-sm font-bold">
+                          {t("sf_feedbackTitle")} — {detail?.dayName}?
+                        </p>
+                        <div className="grid grid-cols-3 gap-2">
+                          {(
+                            [
+                              { key: "tepat",        emoji: "✅", label: t("sf_feedbackTepat") },
+                              { key: "lebih-kurang", emoji: "🤷", label: t("sf_feedbackClose") },
+                              { key: "meleset",      emoji: "❌", label: t("sf_feedbackOff") },
+                            ] as const
+                          ).map(opt => (
+                            <button
+                              key={opt.key}
+                              onClick={() => detail && handleFeedback(detail.isoDate, opt.key)}
+                              className="flex flex-col items-center gap-1.5 rounded-xl border border-border bg-muted/40 hover:bg-muted p-3 tap transition-colors"
+                            >
+                              <span className="text-2xl">{opt.emoji}</span>
+                              <span className="text-[11px] font-semibold text-center leading-tight">
+                                {opt.label}
+                              </span>
+                            </button>
+                          ))}
+                        </div>
+                      </>
                     )}
                   </div>
+                )}
+
+                {/* AI model probability */}
+                <div className="rounded-xl bg-accent/10 border border-accent/30 p-3">
+                  <p className="text-xs font-bold uppercase tracking-wider text-accent-foreground/80 flex items-center gap-1">
+                    <Activity className="w-3 h-3" /> {t("sf_aiModelTitle")}
+                  </p>
+                  <p className="text-sm mt-1 leading-relaxed">
+                    {boss}, {t("sf_aiProb1")} <span className="font-extrabold">{detail.probHit}% {t("sf_aiProb2")}</span> {t("sf_aiProb3")}{" "}
+                    <span className="font-extrabold text-primary">{fmt(detail.expected)}</span>
+                    {" "}— {t("sf_aiPrepRange")} <span className="font-semibold">{fmt(detail.low)}–{fmt(detail.high)}</span>.
+                  </p>
+                  {detail.weather && detail.weather.severity !== "ok" && (
+                    <p className="text-xs text-muted-foreground mt-1.5 flex items-center gap-1">
+                      <CloudRain className="w-3 h-3" /> {detail.weather.label} {detail.weather.emoji}
+                      {" "}({detail.weather.trafficAdjust >= 0 ? "+" : ""}{Math.round(detail.weather.trafficAdjust * 100)}% {t("sf_traffic")})
+                    </p>
+                  )}
+                  {detail.culturalSignal.label && (
+                    <p className="text-xs text-muted-foreground mt-1.5">
+                      🗓️ {detail.culturalSignal.label}
+                      {" "}({detail.culturalSignal.multiplier >= 1 ? "+" : ""}{Math.round((detail.culturalSignal.multiplier - 1) * 100)}% jangkaan)
+                    </p>
+                  )}
+                  {detail.paydaySignal.label && (
+                    <p className="text-xs text-muted-foreground mt-1.5">
+                      💰 {detail.paydaySignal.label}
+                      {" "}(+{Math.round((detail.paydaySignal.multiplier - 1) * 100)}% jangkaan)
+                    </p>
+                  )}
                 </div>
 
                 {detail.reasons.length > 0 && (
@@ -527,30 +625,6 @@ export function SalesForecast({
                       ))}
                     </ul>
                   </div>
-                )}
-
-                {detail.stock.length > 0 ? (
-                  <div>
-                    <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">{t("sf_stockNeeded")} {boss} {t("sf_stockNeededSuffix")}</p>
-                    <div className="space-y-1.5">
-                      {detail.stock.map((s) => (
-                        <div key={s.name} className="flex items-center justify-between text-sm rounded-xl bg-muted/40 px-3 py-2">
-                          <span className="flex items-center gap-2"><span>{s.emoji}</span>{s.name}</span>
-                          <span className="font-semibold">{s.need} {s.unit}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ) : (
-                  <p className="text-xs text-muted-foreground italic">
-                    {t("sf_noStock")}
-                  </p>
-                )}
-
-                {detail.stock.length > 0 && (
-                  <Button onClick={handleSendDayToBuy} className="w-full h-12 rounded-2xl bg-primary text-primary-foreground font-bold">
-                    <ShoppingCart className="w-4 h-4 mr-2" /> {t("sf_addToBuy")}
-                  </Button>
                 )}
               </section>
             )}
