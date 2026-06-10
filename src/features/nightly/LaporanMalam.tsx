@@ -295,6 +295,9 @@ export function LaporanMalam({ onClose, businessName, txns, opex, stock, finishe
       aiLoading={aiLoading}
       aiError={aiError}
       onGenerate={generateReport}
+      txns={txns}
+      finishedStock={finishedStock}
+      products={products}
       onToggleAction={async (id, done) => {
         await toggleActionItem(id, done);
         setActions((prev) => prev.map((a) => (a.id === id ? { ...a, is_done: done } : a)));
