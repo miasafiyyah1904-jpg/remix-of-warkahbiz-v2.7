@@ -648,6 +648,76 @@ function ReportContent(p: ReportContentProps) {
                 </section>
               )}
 
+              {/* Finished goods */}
+              {finishedGoodsStats.length > 0 && (
+                <section className="rounded-2xl bg-card border border-border p-4 shadow-card space-y-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <h2 className="text-sm font-bold flex items-center gap-2">
+                      🍱 {t("lm_fg_title")}
+                    </h2>
+                    {totalWasteValue > 0 && (
+                      <span className="text-xs font-bold text-cost">
+                        {t("lm_fg_wasteTotal")} RM {totalWasteValue.toFixed(2)}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="space-y-3">
+                    {finishedGoodsStats.map(s => (
+                      <div key={s.productId} className="rounded-xl border border-border p-3 space-y-2">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="text-sm font-bold">
+                            {s.productEmoji} {s.productName}
+                          </span>
+                          {s.sellThrough !== null && (
+                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                              s.sellThrough >= 80
+                                ? "bg-profit/15 text-profit"
+                                : s.sellThrough >= 50
+                                ? "bg-warn/15 text-warn"
+                                : "bg-cost/15 text-cost"
+                            }`}>
+                              {s.sellThrough}% {t("lm_fg_soldOut")}
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="grid grid-cols-3 gap-2 text-center">
+                          <div className="rounded-lg bg-muted py-2">
+                            <p className="text-[10px] uppercase font-bold text-muted-foreground">
+                              {t("lm_fg_cooked")}
+                            </p>
+                            <p className="text-base font-extrabold mt-0.5">{s.cooked}</p>
+                          </div>
+                          <div className="rounded-lg bg-profit/10 py-2">
+                            <p className="text-[10px] uppercase font-bold text-muted-foreground">
+                              {t("lm_fg_sold")}
+                            </p>
+                            <p className="text-base font-extrabold mt-0.5 text-profit">{s.soldToday}</p>
+                          </div>
+                          <div className={`rounded-lg py-2 ${s.unsold > 0 ? "bg-cost/10" : "bg-muted"}`}>
+                            <p className="text-[10px] uppercase font-bold text-muted-foreground">
+                              {t("lm_fg_unsold")}
+                            </p>
+                            <p className={`text-base font-extrabold mt-0.5 ${s.unsold > 0 ? "text-cost" : "text-muted-foreground"}`}>
+                              {s.unsold}
+                            </p>
+                          </div>
+                        </div>
+
+                        {s.unsold > 0 && s.price > 0 && (
+                          <p className="text-xs text-cost">
+                            ⚠️ {t("lm_fg_wasteValue").replace("{value}", `RM ${s.wasteValue.toFixed(2)}`)}
+                          </p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+
+                  <p className="text-[10px] text-muted-foreground">{t("lm_fg_note")}</p>
+                </section>
+              )}
+
               {/* AI Section */}
               <AISection report={r} loading={p.aiLoading} error={p.aiError} boss={p.boss} />
 
