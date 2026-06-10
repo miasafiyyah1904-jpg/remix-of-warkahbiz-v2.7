@@ -181,6 +181,7 @@ export function SalesForecast({
   }, []);
 
   const [selectedIso, setSelectedIso] = useState<string | null>(null);
+  const [prepOpen, setPrepOpen] = useState(false);
   const detail = days.find((d) => d.isoDate === selectedIso) ?? days[0];
   const stormDay = days.find((d) => d.weather?.severity === "alert");
 
