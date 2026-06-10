@@ -184,6 +184,83 @@ export function SalesForecast({
   const detail = days.find((d) => d.isoDate === selectedIso) ?? days[0];
   const stormDay = days.find((d) => d.weather?.severity === "alert");
 
+  const [feedbackGiven, setFeedbackGiven] = useState<Record<string, "tepat" | "lebih-kurang" | "meleset">>({});
+
+  const selectedDay = days.find(d => d.isoDate === (selectedIso ?? days[0]?.isoDate));
+  const isPastDay = selectedDay
+    ? new Date(selectedDay.isoDate) < new Date(new Date().toISOString().slice(0, 10))
+    : false;
+
+  const handleFeedback = async (
+    isoDate: string,
+    fb: "tepat" | "lebih-kurang" | "meleset"
+  ) => {
+    setFeedbackGiven(prev => ({ ...prev, [isoDate]: fb }));
+    const day = days.find(d => d.isoDate === isoDate);
+    if (!day) return;
+    const actualMap = {
+      "tepat":        day.expected,
+      "lebih-kurang": (day.low + day.high) / 2,
+      "meleset":      day.low * 0.7,
+    };
+    const estimatedActual = actualMap[fb];
+    const accuracyPct = Math.max(0,
+      Math.round(100 - Math.abs((estimatedActual - day.expected) / day.expected) * 100)
+    );
+    const { supabase } = await import("@/integrations/supabase/client");
+    const { getDeviceId } = await import("@/features/goals/impianApi");
+    const device_id = await getDeviceId();
+    supabase
+      .from("forecasts")
+      .update({
+        actual_revenue: Math.round(estimatedActual),
+        accuracy_pct:   accuracyPct,
+      })
+      .eq("device_id", device_id)
+      .eq("forecast_date", isoDate)
+      .then(() => {});
+  };
+
+  useEffect(() => {
+    if (!txns.length || !days.length) return;
+
+    const run = async () => {
+      const { supabase } = await import("@/integrations/supabase/client");
+      const { getDeviceId } = await import("@/features/goals/impianApi");
+      const device_id = await getDeviceId();
+
+      const dailyCashIn = new Map<string, number>();
+      txns
+        .filter(t => t.type === "in")
+        .forEach(t => {
+          const iso = new Date(t.ts).toISOString().slice(0, 10);
+          dailyCashIn.set(iso, (dailyCashIn.get(iso) ?? 0) + t.amount);
+        });
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const pastDays = days.filter(d =>
+        new Date(d.isoDate) < today && dailyCashIn.has(d.isoDate)
+      );
+
+      for (const d of pastDays) {
+        const actual = dailyCashIn.get(d.isoDate)!;
+        const acc = Math.max(0,
+          Math.round(100 - Math.abs((actual - d.expected) / d.expected) * 100)
+        );
+        await supabase
+          .from("forecasts")
+          .update({ actual_revenue: Math.round(actual), accuracy_pct: acc })
+          .eq("device_id", device_id)
+          .eq("forecast_date", d.isoDate)
+          .is("actual_revenue", null);
+      }
+    };
+
+    run();
+  }, [days, txns]);
+
   const totalRevenue = useMemo(() => days.reduce((s, d) => s + d.expected, 0), [days]);
   const matCost = totalRevenue * 0.45;
   const profit = totalRevenue - matCost;
