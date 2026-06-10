@@ -594,7 +594,20 @@ export function SalesForecast({
                   <p className="text-sm mt-1 leading-relaxed">
                     {boss}, {t("sf_aiProb1")} <span className="font-extrabold">{detail.probHit}% {t("sf_aiProb2")}</span> {t("sf_aiProb3")}{" "}
                     <span className="font-extrabold text-primary">{fmt(detail.expected)}</span>
-                    {" "}— {t("sf_aiPrepRange")} <span className="font-semibold">{fmt(detail.low)}–{fmt(detail.high)}</span>.
+                    {" "}{t("sf_aiPrepRange")} <span className="font-semibold">{fmt(detail.low)}–{fmt(detail.high)}</span>.
+                    {detail.stock.length > 0 && (
+                      <span className="block mt-1 text-xs text-muted-foreground">
+                        {t("sf_aiPrepSuffix")}{" "}
+                        {detail.stock.slice(0, 3).map((s, i) => (
+                          <span key={s.name}>
+                            {s.emoji} {s.name} {s.need}{s.unit}{i < Math.min(detail.stock.length, 3) - 1 ? ", " : ""}
+                          </span>
+                        ))}
+                        {detail.stock.length > 3 && (
+                          <span> +{detail.stock.length - 3} {t("sf_moreItems")}</span>
+                        )}
+                      </span>
+                    )}
                   </p>
                   {detail.weather && detail.weather.severity !== "ok" && (
                     <p className="text-xs text-muted-foreground mt-1.5 flex items-center gap-1">
