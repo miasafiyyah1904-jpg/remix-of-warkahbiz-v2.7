@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { ArrowLeft, TrendingUp, Sparkles, ShoppingCart, CheckCircle2, Clock, Trophy, ChartBar, CloudRain, AlertTriangle, Activity, LineChart as LineChartIcon } from "lucide-react";
+import { ArrowLeft, TrendingUp, Sparkles, ShoppingCart, CheckCircle2, Clock, Trophy, ChartBar, CloudRain, AlertTriangle, Activity, LineChart as LineChartIcon, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { fmt } from "@/lib/format";
