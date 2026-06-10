@@ -251,8 +251,8 @@ export function SalesForecast({
         );
         await supabase
           .from("forecasts")
-          .update({ actual_revenue: Math.round(actual), accuracy_pct: acc })
-          .eq("device_id", device_id)
+          .update({ actual_revenue: Math.round(actual), accuracy_pct: acc } as never)
+          .eq("device_id" as never, device_id as never)
           .eq("forecast_date", d.isoDate)
           .is("actual_revenue", null);
       }
