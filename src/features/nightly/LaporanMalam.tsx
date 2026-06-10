@@ -368,6 +368,43 @@ function ReportContent(p: ReportContentProps) {
   const spendingPct = p.weeklyBudget > 0 ? (agg.weeklyExpenses / p.weeklyBudget) * 100 : 0;
   const spendStatus = spendingPct > 80 ? "red" : spendingPct > 60 ? "amber" : "green";
 
+  const finishedGoodsStats = useMemo(() => {
+    return (p.finishedStock ?? [])
+      .map(fs => {
+        const product = (p.products ?? []).find(pr => pr.id === fs.productId);
+        const price = product?.suggestedPrice ?? product?.sellingPrice ?? 0;
+        const soldToday = p.txns
+          .filter(tx => {
+            const iso = new Date(tx.ts).toISOString().slice(0, 10);
+            return iso === agg.reportDate &&
+              tx.type === "in" &&
+              tx.soldItems?.some(s => s.productId === fs.productId);
+          })
+          .reduce((sum, tx) => {
+            const item = tx.soldItems?.find(s => s.productId === fs.productId);
+            return sum + (item?.qty ?? 0);
+          }, 0);
+        const unsold = fs.qty;
+        const cooked = soldToday + unsold;
+        const sellThrough = cooked > 0 ? Math.round((soldToday / cooked) * 100) : null;
+        const wasteValue = unsold * price;
+        return {
+          productId: fs.productId,
+          productName: fs.productName,
+          productEmoji: fs.productEmoji,
+          soldToday,
+          unsold,
+          cooked,
+          sellThrough,
+          wasteValue,
+          price,
+        };
+      })
+      .filter(s => s.cooked > 0);
+  }, [p.finishedStock, p.products, p.txns, agg.reportDate]);
+
+  const totalWasteValue = finishedGoodsStats.reduce((sum, s) => sum + s.wasteValue, 0);
+
   const handleWhatsApp = () => {
     const text = buildWhatsAppText({
       report: r,
