@@ -529,7 +529,7 @@ export function SalesForecast({
                               <span className="font-medium">{s.name}</span>
                               {(() => {
                                 const fs = (finishedStock ?? []).find(
-                                  f => f.productName.toLowerCase() === s.name.toLowerCase()
+                                  f => products.find(p => p.id === f.productId)?.name?.toLowerCase() === s.name.toLowerCase()
                                 );
                                 const fsQty = fs?.qty ?? 0;
                                 return fsQty > 0 ? (
