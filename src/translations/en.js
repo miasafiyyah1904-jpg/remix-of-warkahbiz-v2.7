@@ -1196,5 +1196,15 @@ export default {
   cookingLog_readyToSell: "Ready to sell",
   fs_ready: "{qty} {unit} ready",
   fs_not_cooked: "Not cooked yet",
+  sf_prepTitle: "What to Prepare",
+  sf_prepBased: "Based on",
+  sf_prepLowDataWarning: "Estimates improve with more records",
+  sf_noProductsTitle: "Products not set up yet",
+  sf_noProductsDesc: "Go to Profile → Products to add your menu items and ingredients. The AI will then calculate exactly how much to prepare each day.",
+  sf_feedbackTitle: "Was this prediction accurate",
+  sf_feedbackTepat: "Spot on",
+  sf_feedbackClose: "Close enough",
+  sf_feedbackOff: "Way off",
+  sf_feedbackThanks: "Thanks — AI will improve from this",
 };
 

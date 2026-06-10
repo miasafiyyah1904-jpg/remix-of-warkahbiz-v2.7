@@ -1195,5 +1195,15 @@ export default {
   cookingLog_readyToSell: "Sedia jual",
   fs_ready: "{qty} {unit} sedia",
   fs_not_cooked: "Belum masak",
+  sf_prepTitle: "Apa Perlu Disediakan",
+  sf_prepBased: "Berdasarkan",
+  sf_prepLowDataWarning: "Anggaran lebih tepat bila rekod bertambah",
+  sf_noProductsTitle: "Produk belum ditetapkan",
+  sf_noProductsDesc: "Pergi ke Profil → Produk untuk tambah menu dan bahan. AI akan kira berapa yang perlu disediakan setiap hari.",
+  sf_feedbackTitle: "Tepat ke ramalan ini",
+  sf_feedbackTepat: "Tepat",
+  sf_feedbackClose: "Lebih kurang",
+  sf_feedbackOff: "Meleset",
+  sf_feedbackThanks: "Terima kasih — AI belajar dari maklum balas ini",
 };
 
