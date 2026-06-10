@@ -438,6 +438,36 @@ export function SalesForecast({
                       <p className="text-[9px] text-muted-foreground leading-tight mt-0.5">
                         {fmt(d.low)}–{fmt(d.high)}
                       </p>
+                      {new Date(d.isoDate) < new Date(new Date().toISOString().slice(0,10)) && (
+                        feedbackGiven[d.isoDate] ? (
+                          <span className="mt-1 inline-block text-[9px] font-semibold text-profit">
+                            ✓ {feedbackGiven[d.isoDate] === "tepat" ? "Tepat" :
+                               feedbackGiven[d.isoDate] === "lebih-kurang" ? "Lebih kurang" : "Meleset"}
+                          </span>
+                        ) : (
+                          <span className="mt-1 inline-block text-[9px] font-semibold text-muted-foreground italic">
+                            Hari lepas
+                          </span>
+                        )
+                      )}
+                      {d.stock.length > 0 ? (
+                        <div className="mt-1.5 space-y-0.5">
+                          {d.stock.slice(0, 2).map(s => (
+                            <p key={s.name} className="text-[9px] leading-tight truncate">
+                              {s.emoji} {s.name} — {s.need}{s.unit}
+                            </p>
+                          ))}
+                          {d.stock.length > 2 && (
+                            <p className="text-[9px] text-muted-foreground italic">
+                              +{d.stock.length - 2} lagi…
+                            </p>
+                          )}
+                        </div>
+                      ) : products.length === 0 ? (
+                        <p className="mt-1.5 text-[9px] text-muted-foreground italic">
+                          Set produk dulu
+                        </p>
+                      ) : null}
                       <div className="mt-2 h-1.5 rounded-full bg-muted overflow-hidden">
                         <div className="h-full bg-primary" style={{ width: `${barPct}%` }} />
                       </div>
