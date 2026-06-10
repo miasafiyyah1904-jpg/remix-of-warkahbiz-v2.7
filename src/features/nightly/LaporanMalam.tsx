@@ -31,7 +31,7 @@ import {
   type NightlyReportRow,
   type ActionItemRow,
 } from "./nightlyReportApi";
-import type { Txn, OpExEntry, StockItem } from "@/types";
+import type { Txn, OpExEntry, StockItem, FinishedStock, Product } from "@/types";
 import { useTranslation } from "@/context/LanguageContext";
 
 const addressBoss = (b: string) => (b?.trim() ? b.trim() : "Boss");
@@ -51,9 +51,11 @@ interface Props {
   txns: Txn[];
   opex: OpExEntry[];
   stock: StockItem[];
+  finishedStock: FinishedStock[];
+  products: Product[];
 }
 
-export function LaporanMalam({ onClose, businessName, txns, opex, stock }: Props) {
+export function LaporanMalam({ onClose, businessName, txns, opex, stock, finishedStock, products }: Props) {
   const { t } = useTranslation();
   const boss = addressBoss(businessName);
   const [view, setView] = useState<"report" | "history">("report");
@@ -293,6 +295,9 @@ export function LaporanMalam({ onClose, businessName, txns, opex, stock }: Props
       aiLoading={aiLoading}
       aiError={aiError}
       onGenerate={generateReport}
+      txns={txns}
+      finishedStock={finishedStock}
+      products={products}
       onToggleAction={async (id, done) => {
         await toggleActionItem(id, done);
         setActions((prev) => prev.map((a) => (a.id === id ? { ...a, is_done: done } : a)));
@@ -350,6 +355,9 @@ interface ReportContentProps {
   onToggleAction: (id: string, done: boolean) => Promise<void>;
   onClose: () => void;
   onOpenHistory: () => void;
+  txns: Txn[];
+  finishedStock: FinishedStock[];
+  products: Product[];
 }
 
 function ReportContent(p: ReportContentProps) {
@@ -359,6 +367,43 @@ function ReportContent(p: ReportContentProps) {
   const weeklyPct = p.weeklyTarget > 0 ? (agg.weeklyRevenue / p.weeklyTarget) * 100 : 0;
   const spendingPct = p.weeklyBudget > 0 ? (agg.weeklyExpenses / p.weeklyBudget) * 100 : 0;
   const spendStatus = spendingPct > 80 ? "red" : spendingPct > 60 ? "amber" : "green";
+
+  const finishedGoodsStats = useMemo(() => {
+    return (p.finishedStock ?? [])
+      .map(fs => {
+        const product = (p.products ?? []).find(pr => pr.id === fs.productId);
+        const price = product?.suggestedPrice ?? product?.sellingPrice ?? 0;
+        const soldToday = p.txns
+          .filter(tx => {
+            const iso = new Date(tx.ts).toISOString().slice(0, 10);
+            return iso === agg.reportDate &&
+              tx.type === "in" &&
+              tx.soldItems?.some(s => s.productId === fs.productId);
+          })
+          .reduce((sum, tx) => {
+            const item = tx.soldItems?.find(s => s.productId === fs.productId);
+            return sum + (item?.qty ?? 0);
+          }, 0);
+        const unsold = fs.qty;
+        const cooked = soldToday + unsold;
+        const sellThrough = cooked > 0 ? Math.round((soldToday / cooked) * 100) : null;
+        const wasteValue = unsold * price;
+        return {
+          productId: fs.productId,
+          productName: fs.productName,
+          productEmoji: fs.productEmoji,
+          soldToday,
+          unsold,
+          cooked,
+          sellThrough,
+          wasteValue,
+          price,
+        };
+      })
+      .filter(s => s.cooked > 0);
+  }, [p.finishedStock, p.products, p.txns, agg.reportDate]);
+
+  const totalWasteValue = finishedGoodsStats.reduce((sum, s) => sum + s.wasteValue, 0);
 
   const handleWhatsApp = () => {
     const text = buildWhatsAppText({
@@ -425,6 +470,30 @@ function ReportContent(p: ReportContentProps) {
         });
         y += 4;
       }
+
+      if (finishedGoodsStats.length > 0) {
+        y += 8;
+        doc.setFontSize(11);
+        doc.setFont("helvetica", "bold");
+        doc.text(t("lm_fg_title"), 14, y);
+        y += 6;
+        doc.setFontSize(9);
+        doc.setFont("helvetica", "normal");
+        finishedGoodsStats.forEach(s => {
+          if (y > 280) { doc.addPage(); y = 18; }
+          doc.text(
+            `${s.productEmoji} ${s.productName}: ${t("lm_fg_cooked")} ${s.cooked} | ${t("lm_fg_sold")} ${s.soldToday} | ${t("lm_fg_unsold")} ${s.unsold}${s.sellThrough !== null ? ` | ${s.sellThrough}%` : ""}`,
+            14,
+            y
+          );
+          y += 5;
+        });
+        if (totalWasteValue > 0) {
+          doc.text(`${t("lm_fg_wasteTotal")}: RM ${totalWasteValue.toFixed(2)}`, 14, y);
+          y += 5;
+        }
+      }
+
 
       if (p.actions.length) {
         doc.setFontSize(13);
@@ -600,6 +669,76 @@ function ReportContent(p: ReportContentProps) {
                       <span className="text-muted-foreground">— {i.qty} {i.unit} ({t("lm_low")})</span>
                     </div>
                   ))}
+                </section>
+              )}
+
+              {/* Finished goods */}
+              {finishedGoodsStats.length > 0 && (
+                <section className="rounded-2xl bg-card border border-border p-4 shadow-card space-y-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <h2 className="text-sm font-bold flex items-center gap-2">
+                      🍱 {t("lm_fg_title")}
+                    </h2>
+                    {totalWasteValue > 0 && (
+                      <span className="text-xs font-bold text-cost">
+                        {t("lm_fg_wasteTotal")} RM {totalWasteValue.toFixed(2)}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="space-y-3">
+                    {finishedGoodsStats.map(s => (
+                      <div key={s.productId} className="rounded-xl border border-border p-3 space-y-2">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="text-sm font-bold">
+                            {s.productEmoji} {s.productName}
+                          </span>
+                          {s.sellThrough !== null && (
+                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                              s.sellThrough >= 80
+                                ? "bg-profit/15 text-profit"
+                                : s.sellThrough >= 50
+                                ? "bg-warn/15 text-warn"
+                                : "bg-cost/15 text-cost"
+                            }`}>
+                              {s.sellThrough}% {t("lm_fg_soldOut")}
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="grid grid-cols-3 gap-2 text-center">
+                          <div className="rounded-lg bg-muted py-2">
+                            <p className="text-[10px] uppercase font-bold text-muted-foreground">
+                              {t("lm_fg_cooked")}
+                            </p>
+                            <p className="text-base font-extrabold mt-0.5">{s.cooked}</p>
+                          </div>
+                          <div className="rounded-lg bg-profit/10 py-2">
+                            <p className="text-[10px] uppercase font-bold text-muted-foreground">
+                              {t("lm_fg_sold")}
+                            </p>
+                            <p className="text-base font-extrabold mt-0.5 text-profit">{s.soldToday}</p>
+                          </div>
+                          <div className={`rounded-lg py-2 ${s.unsold > 0 ? "bg-cost/10" : "bg-muted"}`}>
+                            <p className="text-[10px] uppercase font-bold text-muted-foreground">
+                              {t("lm_fg_unsold")}
+                            </p>
+                            <p className={`text-base font-extrabold mt-0.5 ${s.unsold > 0 ? "text-cost" : "text-muted-foreground"}`}>
+                              {s.unsold}
+                            </p>
+                          </div>
+                        </div>
+
+                        {s.unsold > 0 && s.price > 0 && (
+                          <p className="text-xs text-cost">
+                            ⚠️ {t("lm_fg_wasteValue").replace("{value}", `RM ${s.wasteValue.toFixed(2)}`)}
+                          </p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+
+                  <p className="text-[10px] text-muted-foreground">{t("lm_fg_note")}</p>
                 </section>
               )}
 
