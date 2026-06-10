@@ -89,10 +89,6 @@ export function predictStockPrep(
   const scale = predictedRevenue / baseline;
   const map = new Map<string, StockPrep>();
   for (const p of products) {
-    // Primary: use avg_daily_units if available and > 0
-    // Fallback: estimate from servingsPerBatch ÷ cookFreq
-    //   cookFreq = days between cooks (1 = daily, 2 = every 2 days, 7 = weekly)
-    //   daily output = servingsPerBatch / cookFreq
     const avgDailyUnits =
       (p as { avg_daily_units?: number }).avg_daily_units ?? 0;
     const fallbackDailyUnits = (() => {
@@ -103,8 +99,10 @@ export function predictStockPrep(
     const dailyUnits = avgDailyUnits > 0 ? avgDailyUnits : fallbackDailyUnits;
     const projectedUnits = Math.ceil(dailyUnits * scale);
     if (projectedUnits <= 0) continue;
+    const servingsPerBatch = p.servingsPerBatch ?? p.batchSize ?? 1;
     for (const ing of p.ingredients ?? []) {
-      const need = ing.quantity * projectedUnits;
+      const perServing = ing.quantity / servingsPerBatch;
+      const need = +(perServing * projectedUnits).toFixed(2);
       const cur = map.get(ing.name);
       if (cur) cur.qty += need;
       else map.set(ing.name, {
