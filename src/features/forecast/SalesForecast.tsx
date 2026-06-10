@@ -503,27 +503,49 @@ export function SalesForecast({
                       </p>
                     </div>
 
-                    <div className="space-y-1.5">
-                      {detail.stock.map((s, i) => (
-                        <div key={s.name} className="rounded-xl bg-background/60 border border-border px-3 py-2 space-y-1">
-                          <div className="flex items-center justify-between text-sm">
-                            <span className="flex items-center gap-2"><span>{s.emoji}</span><span className="font-semibold">{s.name}</span></span>
-                            <span className="font-bold text-primary">{s.need} {s.unit}</span>
+                    <button
+                      onClick={() => setPrepOpen(prev => !prev)}
+                      className="w-full flex items-center justify-between rounded-xl bg-muted/50 border border-border px-4 py-3 tap"
+                    >
+                      <span className="text-sm font-semibold">
+                        📋 {detail.stock.length} {t("sf_prepIngCount")}
+                      </span>
+                      <span className="text-muted-foreground text-xs flex items-center gap-1">
+                        {prepOpen ? t("sf_prepHide") : t("sf_prepShow")}
+                        <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${prepOpen ? "rotate-180" : ""}`} />
+                      </span>
+                    </button>
+                    {prepOpen && (
+                      <div className="rounded-xl border border-border overflow-hidden">
+                        {detail.stock.map((s, i) => (
+                          <div
+                            key={s.name}
+                            className={`flex items-center justify-between px-4 py-2.5 text-sm ${
+                              i % 2 === 0 ? "bg-muted/30" : "bg-surface"
+                            }`}
+                          >
+                            <span className="flex items-center gap-2">
+                              <span>{s.emoji}</span>
+                              <span className="font-medium">{s.name}</span>
+                              {(() => {
+                                const fs = (finishedStock ?? []).find(
+                                  f => f.productName.toLowerCase() === s.name.toLowerCase()
+                                );
+                                const fsQty = fs?.qty ?? 0;
+                                return fsQty > 0 ? (
+                                  <span className="text-[10px] font-semibold text-profit bg-profit/10 px-1.5 py-0.5 rounded-full">
+                                    ✅ {fsQty} {t("sf_readyToSell")}
+                                  </span>
+                                ) : null;
+                              })()}
+                            </span>
+                            <span className="font-bold text-primary">
+                              {s.need} <span className="text-xs font-normal text-muted-foreground">{s.unit}</span>
+                            </span>
                           </div>
-                          {(() => {
-                            const fs = (finishedStock ?? []).find(
-                              f => products.find(p => p.id === f.productId)?.name?.toLowerCase() === s.name.toLowerCase()
-                            );
-                            const fsQty = fs?.qty ?? 0;
-                            return fsQty > 0 ? (
-                              <p className="text-[11px] text-profit font-semibold">
-                                ✅ {t("sf_readyToSell")}: {t("sf_readyQty").replace("{qty}", String(fsQty))}
-                              </p>
-                            ) : null;
-                          })()}
-                        </div>
-                      ))}
-                    </div>
+                        ))}
+                      </div>
+                    )}
 
                     {stats.distinctDays < 14 && (
                       <p className="text-[11px] text-muted-foreground italic">
