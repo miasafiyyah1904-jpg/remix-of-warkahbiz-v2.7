@@ -649,6 +649,8 @@ const Index = () => {
             txns={txns}
             opex={opex}
             stock={stock}
+            finishedStock={finishedStock}
+            products={products}
           />
         )}
         {notifOpen && <NotificationCenter onClose={() => setNotifOpen(false)} />}
