@@ -4,7 +4,7 @@ import { toast } from "sonner";
 
 import {
   Home, Package, BarChart3, Plus, MessageCircle,
-  Calculator, Target, LineChart, Trash2, FileText, User,
+  Calculator, Target, LineChart, Trash2, FileText, User, ChevronDown,
 } from "lucide-react";
 import AppHeader from "@/components/AppHeader.jsx";
 import SettingsPanel from "@/components/SettingsPanel.jsx";
@@ -725,6 +725,7 @@ const TodayView = ({
     emoji === "🧑" || /peribadi/i.test(label);
   const { t, language } = useTranslation();
   const [insight, setInsight] = useState<string | null>(null);
+  const [activityOpen, setActivityOpen] = useState(false);
   const dateLocale = language === "en" ? "en-MY" : "ms-MY";
   const todayLabel = new Date().toLocaleDateString(dateLocale, { weekday: "long", day: "numeric", month: "long", year: "numeric" });
   const greeting = () => {
@@ -763,36 +764,6 @@ const TodayView = ({
         </div>
       </div>
 
-      {recentTxns.length > 0 && (
-        <section className="space-y-3 animate-fade-in">
-          <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-wider px-1">
-            {t("home_recentTxns")}
-          </h2>
-          <div className="space-y-2">
-            {recentTxns.map(txn => (
-              <button
-                key={txn.id}
-                onClick={() => onEditTxn(txn)}
-                className="w-full rounded-2xl p-3 bg-surface border border-border flex items-center gap-3 tap text-left"
-              >
-                <div className="w-10 h-10 rounded-xl grid place-items-center text-xl bg-muted/40">
-                  {txn.emoji || (txn.type === "in" ? "💰" : "🛒")}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="font-semibold text-sm truncate">{txn.label}</div>
-                  <div className="text-[11px] text-muted-foreground">
-                    {new Date(txn.ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                  </div>
-                </div>
-                <div className={`font-extrabold text-sm ${txn.type === "in" ? "text-profit" : "text-cost"}`}>
-                  {txn.type === "in" ? "+" : "−"}RM {txn.amount.toFixed(2)}
-                </div>
-              </button>
-            ))}
-          </div>
-        </section>
-      )}
-
       <CookingLogPrompt logs={cookingLog} onOpen={onOpenCookingLog} />
 
 
@@ -826,6 +797,47 @@ const TodayView = ({
           </button>
         </div>
       </section>
+
+      {recentTxns.length > 0 && (
+        <section className="space-y-2 animate-fade-in">
+          <button
+            onClick={() => setActivityOpen(prev => !prev)}
+            className="w-full flex items-center justify-between rounded-2xl px-4 py-3 bg-surface border border-border tap"
+          >
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-bold">{t("home_recentTxns")}</span>
+              <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
+                {recentTxns.length}
+              </span>
+            </div>
+            <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform duration-200 ${activityOpen ? "rotate-180" : ""}`} />
+          </button>
+          {activityOpen && (
+            <div className="space-y-2 animate-fade-in">
+              {recentTxns.map(txn => (
+                <button
+                  key={txn.id}
+                  onClick={() => onEditTxn(txn)}
+                  className="w-full rounded-2xl p-3 bg-surface border border-border flex items-center gap-3 tap text-left"
+                >
+                  <div className="w-10 h-10 rounded-xl grid place-items-center text-xl bg-muted/40">
+                    {txn.emoji || (txn.type === "in" ? "💰" : "🛒")}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-semibold text-sm truncate">{txn.label}</div>
+                    <div className="text-[11px] text-muted-foreground">
+                      {new Date(txn.ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                    </div>
+                  </div>
+                  <div className={`font-extrabold text-sm ${txn.type === "in" ? "text-profit" : "text-cost"}`}>
+                    {txn.type === "in" ? "+" : "−"}RM {txn.amount.toFixed(2)}
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
+        </section>
+      )}
 
 
       {insight && (
