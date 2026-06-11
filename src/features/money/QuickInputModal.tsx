@@ -728,33 +728,42 @@ export const QuickInputModal = ({ onClose, onSave, onUpdate, onReceiptConfirm, o
                   const qty = cart[p.id] ?? 0;
                   const hasPrice = price > 0;
                   return (
-                    <button
+                    <div
                       key={p.id}
-                      onClick={() => { if (!longPressFired.current) incrementProduct(p); longPressFired.current = false; }}
-                      onContextMenu={(e) => { e.preventDefault(); if (qty > 0) decrementProduct(p); }}
-                      onPointerDown={() => {
-                        longPressFired.current = false;
-                        if (longPressTimer.current) clearTimeout(longPressTimer.current);
-                        longPressTimer.current = setTimeout(() => {
-                          longPressFired.current = true;
-                          if ((cart[p.id] ?? 0) > 0) decrementProduct(p);
-                        }, 500);
-                      }}
-                      onPointerUp={() => { if (longPressTimer.current) clearTimeout(longPressTimer.current); }}
-                      onPointerLeave={() => { if (longPressTimer.current) clearTimeout(longPressTimer.current); }}
-                      className={`relative rounded-2xl p-3 bg-surface-elevated border-2 tap flex flex-col items-center gap-1 ${qty > 0 ? "border-profit" : "border-border"}`}
+                      className={`relative rounded-2xl p-3 pb-8 bg-surface-elevated border-2 tap flex flex-col items-center gap-1 ${qty > 0 ? "border-profit" : "border-border"}`}
                     >
-                      {qty > 0 && (
-                        <span className="absolute top-1.5 right-1.5 min-w-[22px] h-[22px] px-1.5 rounded-full bg-profit text-profit-foreground text-[11px] font-extrabold grid place-items-center">
-                          {qty}
-                        </span>
-                      )}
                       <div className="text-3xl">{p.emoji || "🍽️"}</div>
                       <div className="text-xs font-bold text-center line-clamp-1 w-full">{p.name}</div>
                       <div className={`text-xs font-semibold ${hasPrice ? "text-profit" : "text-muted-foreground"}`}>
                         {hasPrice ? `RM ${price.toFixed(2)}` : t("pos_no_price")}
                       </div>
-                    </button>
+                      {qty === 0 ? (
+                        <button
+                          onClick={() => incrementProduct(p)}
+                          className="absolute bottom-1.5 right-1.5 w-7 h-7 rounded-full bg-profit text-profit-foreground text-base font-extrabold grid place-items-center tap"
+                        >
+                          +
+                        </button>
+                      ) : (
+                        <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 flex items-center gap-1">
+                          <button
+                            onClick={() => decrementProduct(p)}
+                            className="w-7 h-7 rounded-full bg-muted text-foreground text-base font-extrabold grid place-items-center tap"
+                          >
+                            −
+                          </button>
+                          <span className="text-xs font-extrabold text-profit min-w-[18px] text-center">
+                            {qty}
+                          </span>
+                          <button
+                            onClick={() => incrementProduct(p)}
+                            className="w-7 h-7 rounded-full bg-profit text-profit-foreground text-base font-extrabold grid place-items-center tap"
+                          >
+                            +
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   );
                 })}
               </div>
