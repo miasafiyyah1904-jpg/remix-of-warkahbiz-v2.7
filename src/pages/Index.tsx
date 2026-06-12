@@ -558,7 +558,7 @@ const Index = () => {
               <TodayView
                 today={today}
                 profileName={profileName} businessName={businessName}
-                duitKeluar={todayCogs + todayOtherOpex + today.out}
+                duitKeluar={todayCogs + todayOtherOpex}
                 cookingLog={cookingLog}
                 onOpenCookingLog={() => setCookingLogOpen(true)}
                 onOpenCalc={() => setCalcOpen(true)}
