@@ -36,8 +36,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   }, [language]);
 
   const setLanguage = (lang: Language) => {
-    setLanguageState("ms");
-    setTimeout(() => setLanguageState(lang), 0);
+    setLanguageState(lang);
   };
 
   const dict = DICTS[language] ?? DICTS.ms;
