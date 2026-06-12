@@ -259,7 +259,7 @@ const Index = () => {
     entries.forEach(({ productId, batches }) => {
       const product = products.find(p => p.id === productId);
       if (!product || batches <= 0) return;
-      const servings = product.servingsPerBatch ?? product.batchSize ?? 1;
+      const servings = product.servingsPerCookingUnit ?? product.servingsPerBatch ?? product.batchSize ?? 1;
       const produced = batches * servings;
       setFinishedStock(prev => {
         const existing = prev.find(f => f.productId === productId);
