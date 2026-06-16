@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Share2, ChevronDown, ChevronRight, FileText, Trash2 } from "lucide-react";
+import { Share2, ChevronDown, ChevronRight, FileText, Trash2, X } from "lucide-react";
 import type { Txn, OpExEntry, OpExCategory } from "@/types";
 import { OPEX_CATEGORIES, OPEX_EMOJI } from "@/types";
 import { fmt } from "@/lib/format";
@@ -74,12 +74,18 @@ export const LogView = ({ txns, today, week, month, opex, todayCogs, todayOtherO
   const dateLocale = language === "en" ? "en-MY" : "ms-MY";
   const [range, setRange] = useState<"today" | "week" | "month">("today");
   const [filter, setFilter] = useState<Filter>("all");
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [opexSheet, setOpexSheet] = useState(false);
   const [expandedPeribadi, setExpandedPeribadi] = useState<Set<string>>(new Set());
   const [collapsedDates, setCollapsedDates] = useState<Set<string>>(new Set());
   const [expandedDates, setExpandedDates] = useState<Set<string>>(new Set());
   const toggleDate = (k: string) => setCollapsedDates(p => { const n = new Set(p); n.has(k) ? n.delete(k) : n.add(k); return n; });
   const toggleShowAll = (k: string) => setExpandedDates(p => { const n = new Set(p); n.has(k) ? n.delete(k) : n.add(k); return n; });
+
+  const filteredTxns = useMemo(() => {
+    if (!selectedDate) return txns;
+    return txns.filter(t => dateKeyOf(t.createdAt, t.ts) === selectedDate);
+  }, [txns, selectedDate]);
 
   const sum = range === "today" ? today : range === "week" ? week : month;
 
@@ -89,7 +95,7 @@ export const LogView = ({ txns, today, week, month, opex, todayCogs, todayOtherO
   const salesByDate = useMemo(() => {
     if (filter !== "in") return [];
     const map = new Map<string, { dateKey: string; label: string; total: number; items: Txn[] }>();
-    txns.filter(t => t.type === "in").forEach(t => {
+    filteredTxns.filter(t => t.type === "in").forEach(t => {
       const d = dateOf(t.createdAt, t.ts);
       const key = d.toISOString().slice(0, 10);
       const label = d.toLocaleDateString(dateLocale, { weekday: "long", day: "numeric", month: "long", year: "numeric" });
@@ -99,12 +105,12 @@ export const LogView = ({ txns, today, week, month, opex, todayCogs, todayOtherO
       map.set(key, cur);
     });
     return Array.from(map.values()).sort((a, b) => b.dateKey.localeCompare(a.dateKey));
-  }, [filter, txns]);
+  }, [filter, filteredTxns]);
 
   // Group all/out txns by date
   const txnsByDate = useMemo(() => {
     if (filter !== "all" && filter !== "out") return [];
-    const subset = filter === "all" ? txns : txns.filter(t => t.type === "out");
+    const subset = filter === "all" ? filteredTxns : filteredTxns.filter(t => t.type === "out");
     const map = new Map<string, { dateKey: string; label: string; items: Txn[]; peribadi: Txn[] }>();
     subset.forEach(t => {
       const d = dateOf(t.createdAt, t.ts);
@@ -118,7 +124,7 @@ export const LogView = ({ txns, today, week, month, opex, todayCogs, todayOtherO
     return Array.from(map.values())
       .map(g => ({ ...g, items: g.items.slice().reverse(), peribadi: g.peribadi.slice().reverse() }))
       .sort((a, b) => b.dateKey.localeCompare(a.dateKey));
-  }, [filter, txns]);
+  }, [filter, filteredTxns]);
 
   const opexByCategory = OPEX_CATEGORIES.reduce((acc, cat) => {
     acc[cat] = opex.filter((e) => e.category === cat).reduce((s, e) => s + e.amount, 0);
@@ -263,6 +269,36 @@ export const LogView = ({ txns, today, week, month, opex, todayCogs, todayOtherO
             ))}
           </div>
 
+          <div className="flex items-center gap-2 px-1 mt-2">
+            <button
+              onClick={() => setSelectedDate(null)}
+              className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
+                !selectedDate
+                  ? "bg-primary text-primary-foreground border-primary"
+                  : "bg-background text-muted-foreground border-border"
+              }`}
+            >
+              {t("allDates")}
+            </button>
+
+            <div className="relative flex-1">
+              <input
+                type="date"
+                value={selectedDate ?? ""}
+                onChange={(e) => setSelectedDate(e.target.value || null)}
+                className="w-full text-xs px-3 py-1.5 rounded-full border border-border bg-background text-foreground appearance-none cursor-pointer"
+              />
+              {selectedDate && (
+                <button
+                  onClick={() => setSelectedDate(null)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              )}
+            </div>
+          </div>
+
           <div className="grid grid-cols-3 gap-2">
             <MiniStat label={t("colIn")}     value={sum.in}     tone="income" />
             <MiniStat label={t("colOut")}    value={sum.out}    tone="cost" />
@@ -273,9 +309,18 @@ export const LogView = ({ txns, today, week, month, opex, todayCogs, todayOtherO
             <section className="space-y-3">
               <h2 className="text-xs font-bold uppercase tracking-wider text-muted-foreground px-1">{t("salesByDateHeader")}</h2>
               {salesByDate.length === 0 ? (
-                <div className="rounded-2xl p-6 bg-surface border border-dashed border-border text-center text-sm text-muted-foreground">
-                  {t("noSalesRecorded")}
-                </div>
+                selectedDate ? (
+                  <div className="text-center py-10 text-muted-foreground text-sm">
+                    <p>📭 {t("noRecordsForDate")}</p>
+                    <button onClick={() => setSelectedDate(null)} className="mt-2 text-xs underline text-primary">
+                      {t("clearDateFilter")}
+                    </button>
+                  </div>
+                ) : (
+                  <div className="rounded-2xl p-6 bg-surface border border-dashed border-border text-center text-sm text-muted-foreground">
+                    {t("noSalesRecorded")}
+                  </div>
+                )
               ) : (
                 salesByDate.map((group, gi) => {
                   const isCollapsed = gi === 0 ? collapsedDates.has(group.dateKey) : !expandedDates.has(`open-${group.dateKey}`);
@@ -329,9 +374,18 @@ export const LogView = ({ txns, today, week, month, opex, todayCogs, todayOtherO
             <section className="space-y-3">
               <h2 className="text-xs font-bold uppercase tracking-wider text-muted-foreground px-1">{t("txnsByDateHeader")}</h2>
               {txnsByDate.length === 0 ? (
-                <div className="rounded-2xl p-6 bg-surface border border-dashed border-border text-center text-sm text-muted-foreground">
-                  {t("noTxnsRecorded")}
-                </div>
+                selectedDate ? (
+                  <div className="text-center py-10 text-muted-foreground text-sm">
+                    <p>📭 {t("noRecordsForDate")}</p>
+                    <button onClick={() => setSelectedDate(null)} className="mt-2 text-xs underline text-primary">
+                      {t("clearDateFilter")}
+                    </button>
+                  </div>
+                ) : (
+                  <div className="rounded-2xl p-6 bg-surface border border-dashed border-border text-center text-sm text-muted-foreground">
+                    {t("noTxnsRecorded")}
+                  </div>
+                )
               ) : (
                 txnsByDate.map((group, gi) => {
                   const dayTotal = group.items.reduce((s, t) => s + (t.type === "in" ? t.amount : -t.amount), 0);

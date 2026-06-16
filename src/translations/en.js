@@ -1225,5 +1225,8 @@ export default {
   updateNote2: "Nightly Report now shows sell-through rate & estimated leftover value",
   updateNote3: "Cooking Log is now connected to POS & Nightly Report",
   updateNote4: "Bug fix for daily unit count in forecast",
+  allDates: "All Dates",
+  noRecordsForDate: "No records for this date",
+  clearDateFilter: "Show all records",
 };
 

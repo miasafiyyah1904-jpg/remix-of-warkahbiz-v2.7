@@ -1224,5 +1224,8 @@ export default {
   updateNote2: "Laporan Malam kini tunjuk kadar jual habis & anggaran nilai sisa",
   updateNote3: "Rekod Masakan disambung terus ke POS & Laporan Malam",
   updateNote4: "Pembetulan pepijat pada kiraan unit harian dalam ramalan",
+  allDates: "Semua Tarikh",
+  noRecordsForDate: "Tiada rekod untuk tarikh ini",
+  clearDateFilter: "Papar semua rekod",
 };
 
