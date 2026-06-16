@@ -269,6 +269,36 @@ export const LogView = ({ txns, today, week, month, opex, todayCogs, todayOtherO
             ))}
           </div>
 
+          <div className="flex items-center gap-2 px-1 mt-2">
+            <button
+              onClick={() => setSelectedDate(null)}
+              className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
+                !selectedDate
+                  ? "bg-primary text-primary-foreground border-primary"
+                  : "bg-background text-muted-foreground border-border"
+              }`}
+            >
+              {t("allDates")}
+            </button>
+
+            <div className="relative flex-1">
+              <input
+                type="date"
+                value={selectedDate ?? ""}
+                onChange={(e) => setSelectedDate(e.target.value || null)}
+                className="w-full text-xs px-3 py-1.5 rounded-full border border-border bg-background text-foreground appearance-none cursor-pointer"
+              />
+              {selectedDate && (
+                <button
+                  onClick={() => setSelectedDate(null)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              )}
+            </div>
+          </div>
+
           <div className="grid grid-cols-3 gap-2">
             <MiniStat label={t("colIn")}     value={sum.in}     tone="income" />
             <MiniStat label={t("colOut")}    value={sum.out}    tone="cost" />
