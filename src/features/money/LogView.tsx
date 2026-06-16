@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Share2, ChevronDown, ChevronRight, FileText, Trash2 } from "lucide-react";
+import { Share2, ChevronDown, ChevronRight, FileText, Trash2, X } from "lucide-react";
 import type { Txn, OpExEntry, OpExCategory } from "@/types";
 import { OPEX_CATEGORIES, OPEX_EMOJI } from "@/types";
 import { fmt } from "@/lib/format";
