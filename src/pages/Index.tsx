@@ -4,7 +4,7 @@ import { toast } from "sonner";
 
 import {
   Home, Package, BarChart3, Plus, MessageCircle,
-  Calculator, Target, LineChart, Trash2, FileText, User, ChevronDown,
+  Calculator, Target, LineChart, Trash2, FileText, User, ChevronDown, Bell, X,
 } from "lucide-react";
 import AppHeader from "@/components/AppHeader.jsx";
 import SettingsPanel from "@/components/SettingsPanel.jsx";
@@ -65,6 +65,14 @@ const Index = () => {
   const [nightlyBannerShown, setNightlyBannerShown] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const [cookingLogOpen, setCookingLogOpen] = useState(false);
+  const CURRENT_VERSION = "2.7";
+  const updateStorageKey = `warkahbiz_updates_seen_${CURRENT_VERSION}`;
+  const [updatesOpen, setUpdatesOpen] = useState(false);
+  const [hasUnreadUpdates, setHasUnreadUpdates] = useState(false);
+  useEffect(() => {
+    const seen = localStorage.getItem(updateStorageKey);
+    if (!seen) setHasUnreadUpdates(true);
+  }, []);
 
   const [profileName, setProfileName] = useLocalStorage<string>("warkahbiz_profile_name", "");
   const [businessName, setBusinessName] = useLocalStorage<string>("warkahbiz_business_name", "");
@@ -569,6 +577,10 @@ const Index = () => {
                 onOpenProjection={() => setProjectionOpen(true)}
                 txns={txns}
                 onEditTxn={(t) => { setEditingTxn(t); setModalOpen(true); }}
+                updatesOpen={updatesOpen}
+                setUpdatesOpen={setUpdatesOpen}
+                hasUnreadUpdates={hasUnreadUpdates}
+                setHasUnreadUpdates={setHasUnreadUpdates}
               />
             </>
           )}
@@ -710,6 +722,7 @@ const TodayView = ({
   cookingLog, onOpenCookingLog,
   onOpenCalc, onOpenGoals, onOpenForecast, onOpenWaste, onOpenAutopsy, onOpenProjection,
   txns, onEditTxn,
+  updatesOpen, setUpdatesOpen, hasUnreadUpdates, setHasUnreadUpdates,
 }: {
   today: { in: number; out: number; profit: number };
   profileName: string; businessName: string;
@@ -719,6 +732,10 @@ const TodayView = ({
   onOpenWaste: () => void; onOpenAutopsy: () => void; onOpenProjection: () => void;
   txns: Txn[];
   onEditTxn: (t: Txn) => void;
+  updatesOpen: boolean;
+  setUpdatesOpen: (v: boolean) => void;
+  hasUnreadUpdates: boolean;
+  setHasUnreadUpdates: (v: boolean) => void;
 }) => {
   void onOpenCalc;
   const isPeribadi = (label: string, emoji: string) =>
@@ -749,7 +766,58 @@ const TodayView = ({
         <p className="text-muted-foreground text-sm font-medium">{greeting()}, {profileName || "Boss"}! 👋</p>
         <h1 className="text-2xl font-extrabold tracking-tight">{businessName || "WarkahBiz"}</h1>
         <p className="text-xs text-muted-foreground font-semibold">📅 {todayLabel}</p>
+        <button
+          onClick={() => setUpdatesOpen(true)}
+          className="flex items-center gap-1.5 mt-2 w-fit"
+        >
+          <div className="relative">
+            <Bell className="w-4 h-4 text-muted-foreground" />
+            {hasUnreadUpdates && (
+              <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full" />
+            )}
+          </div>
+          <span className="text-xs text-muted-foreground">Apa Yang Baru</span>
+        </button>
       </header>
+
+      {updatesOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+          <div className="bg-background rounded-2xl shadow-xl w-full max-w-sm p-5 space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="font-bold text-base">Kemaskini Terbaru 🎉</h2>
+                <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">v2.7</span>
+              </div>
+              <button onClick={() => setUpdatesOpen(false)} className="text-muted-foreground hover:text-foreground">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <ul className="space-y-2">
+              {[
+                "Ramalan Jualan kini lebih tepat dengan data jualan sebenar",
+                "Laporan Malam kini tunjuk kadar jual habis & anggaran nilai sisa",
+                "Rekod Masakan disambung terus ke POS & Laporan Malam",
+                "Pembetulan pepijat pada kiraan unit harian dalam ramalan",
+              ].map((item, i) => (
+                <li key={i} className="flex items-start gap-2 text-sm">
+                  <span className="text-green-500 mt-0.5">✓</span>
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+            <button
+              onClick={() => {
+                localStorage.setItem(`warkahbiz_updates_seen_2.7`, "true");
+                setHasUnreadUpdates(false);
+                setUpdatesOpen(false);
+              }}
+              className="w-full py-2.5 rounded-xl bg-gradient-profit text-profit-foreground font-semibold text-sm"
+            >
+              Faham, terima kasih ✓
+            </button>
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-2 gap-3">
         <div className="rounded-3xl p-6 bg-gradient-income text-white shadow-card animate-fade-in">
