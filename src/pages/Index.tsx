@@ -65,6 +65,14 @@ const Index = () => {
   const [nightlyBannerShown, setNightlyBannerShown] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const [cookingLogOpen, setCookingLogOpen] = useState(false);
+  const CURRENT_VERSION = "2.7";
+  const updateStorageKey = `warkahbiz_updates_seen_${CURRENT_VERSION}`;
+  const [updatesOpen, setUpdatesOpen] = useState(false);
+  const [hasUnreadUpdates, setHasUnreadUpdates] = useState(false);
+  useEffect(() => {
+    const seen = localStorage.getItem(updateStorageKey);
+    if (!seen) setHasUnreadUpdates(true);
+  }, []);
 
   const [profileName, setProfileName] = useLocalStorage<string>("warkahbiz_profile_name", "");
   const [businessName, setBusinessName] = useLocalStorage<string>("warkahbiz_business_name", "");
