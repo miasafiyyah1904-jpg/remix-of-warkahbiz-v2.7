@@ -4,7 +4,7 @@ import { toast } from "sonner";
 
 import {
   Home, Package, BarChart3, Plus, MessageCircle,
-  Calculator, Target, LineChart, Trash2, FileText, User, ChevronDown,
+  Calculator, Target, LineChart, Trash2, FileText, User, ChevronDown, Bell, X,
 } from "lucide-react";
 import AppHeader from "@/components/AppHeader.jsx";
 import SettingsPanel from "@/components/SettingsPanel.jsx";
