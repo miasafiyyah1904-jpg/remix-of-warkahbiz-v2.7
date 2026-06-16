@@ -124,7 +124,7 @@ export const LogView = ({ txns, today, week, month, opex, todayCogs, todayOtherO
     return Array.from(map.values())
       .map(g => ({ ...g, items: g.items.slice().reverse(), peribadi: g.peribadi.slice().reverse() }))
       .sort((a, b) => b.dateKey.localeCompare(a.dateKey));
-  }, [filter, txns]);
+  }, [filter, filteredTxns]);
 
   const opexByCategory = OPEX_CATEGORIES.reduce((acc, cat) => {
     acc[cat] = opex.filter((e) => e.category === cat).reduce((s, e) => s + e.amount, 0);
