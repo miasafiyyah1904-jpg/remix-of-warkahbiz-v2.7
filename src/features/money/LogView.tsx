@@ -74,12 +74,18 @@ export const LogView = ({ txns, today, week, month, opex, todayCogs, todayOtherO
   const dateLocale = language === "en" ? "en-MY" : "ms-MY";
   const [range, setRange] = useState<"today" | "week" | "month">("today");
   const [filter, setFilter] = useState<Filter>("all");
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [opexSheet, setOpexSheet] = useState(false);
   const [expandedPeribadi, setExpandedPeribadi] = useState<Set<string>>(new Set());
   const [collapsedDates, setCollapsedDates] = useState<Set<string>>(new Set());
   const [expandedDates, setExpandedDates] = useState<Set<string>>(new Set());
   const toggleDate = (k: string) => setCollapsedDates(p => { const n = new Set(p); n.has(k) ? n.delete(k) : n.add(k); return n; });
   const toggleShowAll = (k: string) => setExpandedDates(p => { const n = new Set(p); n.has(k) ? n.delete(k) : n.add(k); return n; });
+
+  const filteredTxns = useMemo(() => {
+    if (!selectedDate) return txns;
+    return txns.filter(t => dateKeyOf(t.createdAt, t.ts) === selectedDate);
+  }, [txns, selectedDate]);
 
   const sum = range === "today" ? today : range === "week" ? week : month;
 
