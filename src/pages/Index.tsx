@@ -722,6 +722,7 @@ const TodayView = ({
   cookingLog, onOpenCookingLog,
   onOpenCalc, onOpenGoals, onOpenForecast, onOpenWaste, onOpenAutopsy, onOpenProjection,
   txns, onEditTxn,
+  updatesOpen, setUpdatesOpen, hasUnreadUpdates, setHasUnreadUpdates,
 }: {
   today: { in: number; out: number; profit: number };
   profileName: string; businessName: string;
@@ -731,6 +732,10 @@ const TodayView = ({
   onOpenWaste: () => void; onOpenAutopsy: () => void; onOpenProjection: () => void;
   txns: Txn[];
   onEditTxn: (t: Txn) => void;
+  updatesOpen: boolean;
+  setUpdatesOpen: (v: boolean) => void;
+  hasUnreadUpdates: boolean;
+  setHasUnreadUpdates: (v: boolean) => void;
 }) => {
   void onOpenCalc;
   const isPeribadi = (label: string, emoji: string) =>
