@@ -95,7 +95,7 @@ export const LogView = ({ txns, today, week, month, opex, todayCogs, todayOtherO
   const salesByDate = useMemo(() => {
     if (filter !== "in") return [];
     const map = new Map<string, { dateKey: string; label: string; total: number; items: Txn[] }>();
-    txns.filter(t => t.type === "in").forEach(t => {
+    filteredTxns.filter(t => t.type === "in").forEach(t => {
       const d = dateOf(t.createdAt, t.ts);
       const key = d.toISOString().slice(0, 10);
       const label = d.toLocaleDateString(dateLocale, { weekday: "long", day: "numeric", month: "long", year: "numeric" });
@@ -105,12 +105,12 @@ export const LogView = ({ txns, today, week, month, opex, todayCogs, todayOtherO
       map.set(key, cur);
     });
     return Array.from(map.values()).sort((a, b) => b.dateKey.localeCompare(a.dateKey));
-  }, [filter, txns]);
+  }, [filter, filteredTxns]);
 
   // Group all/out txns by date
   const txnsByDate = useMemo(() => {
     if (filter !== "all" && filter !== "out") return [];
-    const subset = filter === "all" ? txns : txns.filter(t => t.type === "out");
+    const subset = filter === "all" ? filteredTxns : filteredTxns.filter(t => t.type === "out");
     const map = new Map<string, { dateKey: string; label: string; items: Txn[]; peribadi: Txn[] }>();
     subset.forEach(t => {
       const d = dateOf(t.createdAt, t.ts);
