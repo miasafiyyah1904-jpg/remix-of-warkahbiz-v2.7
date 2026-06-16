@@ -577,6 +577,10 @@ const Index = () => {
                 onOpenProjection={() => setProjectionOpen(true)}
                 txns={txns}
                 onEditTxn={(t) => { setEditingTxn(t); setModalOpen(true); }}
+                updatesOpen={updatesOpen}
+                setUpdatesOpen={setUpdatesOpen}
+                hasUnreadUpdates={hasUnreadUpdates}
+                setHasUnreadUpdates={setHasUnreadUpdates}
               />
             </>
           )}
