@@ -785,7 +785,7 @@ const TodayView = ({
           <div className="bg-background rounded-2xl shadow-xl w-full max-w-sm p-5 space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="font-bold text-base">Kemaskini Terbaru 🎉</h2>
+                <h2 className="font-bold text-base">{t("whatsNewTitle")}</h2>
                 <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">v2.7</span>
               </div>
               <button onClick={() => setUpdatesOpen(false)} className="text-muted-foreground hover:text-foreground">
@@ -794,10 +794,10 @@ const TodayView = ({
             </div>
             <ul className="space-y-2">
               {[
-                "Ramalan Jualan kini lebih tepat dengan data jualan sebenar",
-                "Laporan Malam kini tunjuk kadar jual habis & anggaran nilai sisa",
-                "Rekod Masakan disambung terus ke POS & Laporan Malam",
-                "Pembetulan pepijat pada kiraan unit harian dalam ramalan",
+                t("updateNote1"),
+                t("updateNote2"),
+                t("updateNote3"),
+                t("updateNote4"),
               ].map((item, i) => (
                 <li key={i} className="flex items-start gap-2 text-sm">
                   <span className="text-green-500 mt-0.5">✓</span>
@@ -813,7 +813,7 @@ const TodayView = ({
               }}
               className="w-full py-2.5 rounded-xl bg-gradient-profit text-profit-foreground font-semibold text-sm"
             >
-              Faham, terima kasih ✓
+              {t("whatsNewDismiss")}
             </button>
           </div>
         </div>

@@ -1219,5 +1219,11 @@ export default {
   sf_feedbackClose: "Close enough",
   sf_feedbackOff: "Way off",
   sf_feedbackThanks: "Thanks — AI will improve from this",
+  whatsNewTitle: "What's New 🎉",
+  whatsNewDismiss: "Got it, thanks ✓",
+  updateNote1: "Sales Forecast is now more accurate with real sales data",
+  updateNote2: "Nightly Report now shows sell-through rate & estimated leftover value",
+  updateNote3: "Cooking Log is now connected to POS & Nightly Report",
+  updateNote4: "Bug fix for daily unit count in forecast",
 };
 

@@ -1218,5 +1218,11 @@ export default {
   sf_feedbackClose: "Lebih kurang",
   sf_feedbackOff: "Meleset",
   sf_feedbackThanks: "Terima kasih — AI belajar dari maklum balas ini",
+  whatsNewTitle: "Kemaskini Terbaru 🎉",
+  whatsNewDismiss: "Faham, terima kasih ✓",
+  updateNote1: "Ramalan Jualan kini lebih tepat dengan data jualan sebenar",
+  updateNote2: "Laporan Malam kini tunjuk kadar jual habis & anggaran nilai sisa",
+  updateNote3: "Rekod Masakan disambung terus ke POS & Laporan Malam",
+  updateNote4: "Pembetulan pepijat pada kiraan unit harian dalam ramalan",
 };
 
