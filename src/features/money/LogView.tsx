@@ -309,9 +309,18 @@ export const LogView = ({ txns, today, week, month, opex, todayCogs, todayOtherO
             <section className="space-y-3">
               <h2 className="text-xs font-bold uppercase tracking-wider text-muted-foreground px-1">{t("salesByDateHeader")}</h2>
               {salesByDate.length === 0 ? (
-                <div className="rounded-2xl p-6 bg-surface border border-dashed border-border text-center text-sm text-muted-foreground">
-                  {t("noSalesRecorded")}
-                </div>
+                selectedDate ? (
+                  <div className="text-center py-10 text-muted-foreground text-sm">
+                    <p>📭 {t("noRecordsForDate")}</p>
+                    <button onClick={() => setSelectedDate(null)} className="mt-2 text-xs underline text-primary">
+                      {t("clearDateFilter")}
+                    </button>
+                  </div>
+                ) : (
+                  <div className="rounded-2xl p-6 bg-surface border border-dashed border-border text-center text-sm text-muted-foreground">
+                    {t("noSalesRecorded")}
+                  </div>
+                )
               ) : (
                 salesByDate.map((group, gi) => {
                   const isCollapsed = gi === 0 ? collapsedDates.has(group.dateKey) : !expandedDates.has(`open-${group.dateKey}`);
